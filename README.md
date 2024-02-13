@@ -62,7 +62,8 @@ Git, Discord, Notion
 
 <br>
 
-<img width="993" alt="image" src="https://github.com/TrandPick/TrendPick_Pro/assets/26915908/0ec026c9-5ea3-46c9-99f6-2a530a54fa4b">
+<img width="1232" alt="image" src="https://github.com/angelSooho/TrendPick/assets/26915908/5cba7cb4-a30c-40c4-8169-966cf441ab5c">
+
 
 
 
