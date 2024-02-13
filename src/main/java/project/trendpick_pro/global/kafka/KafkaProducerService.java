@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.trendpick_pro.domain.orders.entity.dto.request.OrderStateResponse;
 import project.trendpick_pro.global.kafka.kafkasave.entity.OutboxMessage;
 import project.trendpick_pro.global.kafka.kafkasave.service.OutboxMessageService;
+import project.trendpick_pro.global.redis.service.RedisService;
 
 import java.util.UUID;
 
@@ -23,22 +24,36 @@ public class KafkaProducerService {
     private final OutboxMessageService outboxMessageService;
 
     private final RetryTemplate retryTemplate;
+    private final RedisService redisService;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     private final ObjectMapper objectMapper;
 
     @Transactional
+    @Async
     public void sendMessage(Long id) {
-        OutboxMessage outboxMessage = outboxMessageService.findById(id);
-        retryTemplate.execute(context -> {
-            kafkaTemplate.send(outboxMessage.getTopic(), outboxMessage.getPayload(), outboxMessage.getMessage());
-            log.info("Message sent: {}", outboxMessage.getMessage());
-            outboxMessageService.delete(outboxMessage);
-            return null;
-        }, context -> {
-            log.error("Failed to send message: {}", context.getLastThrowable().getMessage());
-            return null;
-        });
+        while(true) {
+            String dequeue = redisService.dequeue(20L);
+            if(dequeue != null) {
+                OutboxMessage outboxMessage = outboxMessageService.findById(id);
+                retryTemplate.execute(context -> {
+                    kafkaTemplate.send(outboxMessage.getTopic(), outboxMessage.getPayload(), outboxMessage.getMessage());
+                    log.info("Message sent: {}", outboxMessage.getMessage());
+                    outboxMessageService.delete(outboxMessage);
+                    return null;
+                }, context -> {
+                    log.error("Failed to send message: {}", context.getLastThrowable().getMessage());
+                    return null;
+                });
+                break;
+            } else {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @Transactional
