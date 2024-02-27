@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import project.trendpick_pro.domain.member.entity.Member;
-import project.trendpick_pro.domain.member.service.MemberService;
 import project.trendpick_pro.domain.withdraw.entity.WithdrawApply;
 import project.trendpick_pro.domain.withdraw.entity.dto.WithDrawApplyForm;
 import project.trendpick_pro.domain.withdraw.service.WithdrawService;

@@ -6,9 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.trendpick_pro.domain.common.base.BaseTimeEntity;
-import project.trendpick_pro.domain.member.entity.form.JoinForm;
 import project.trendpick_pro.domain.tags.favoritetag.entity.FavoriteTag;
 import project.trendpick_pro.domain.tags.tag.entity.TagType;
+import project.trendpick_pro.global.crypto.oauth2.OAuthTokenResponse;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
@@ -17,59 +17,62 @@ import java.util.Set;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "member",
-        indexes = {@Index(name = "index_member_email",  columnList="email", unique = true)})
 public class Member extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_id")
     private Long id;
 
-    @Column(name = "email",unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(name = "password", nullable = false)
-    private String password;
+    @Column(nullable = false)
+    private String nickName;
 
-    @Column(name = "username", nullable = false)
-    private String username;
-
-    @Column(name = "phone_number", nullable = false)
+    @Column(nullable = false)
     private String phoneNumber;
 
+    private String address;
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
-    private MemberRoleType role;
+    @Column(nullable = false)
+    private SocialProvider provider;
+
+    @Embedded
+    private SocialAuthToken socialAuthToken;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MemberRole role;
 
     private String brand;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private Set<FavoriteTag> tags = new LinkedHashSet<>();
 
-    private String bankName;
-    private String bankAccount;
-
-    private String address;
-    private LocalDateTime recentlyAccessDate;
     private long restCash;
 
     @Builder
-    private Member(String email, String password, String username, String phoneNumber, MemberRoleType role, String brand) {
+    private Member(String email, String nickName, String phoneNumber,
+                   SocialProvider provider, MemberRole role, String brand,
+                   OAuthTokenResponse socialAuthToken) {
         this.email = email;
-        this.password = password;
-        this.username = username;
+        this.nickName = nickName;
         this.phoneNumber = phoneNumber;
+        this.provider = provider;
         this.role = role;
         this.brand = brand;
+        this.socialAuthToken = new SocialAuthToken(
+                socialAuthToken.getAccessToken(),
+                socialAuthToken.getRefreshToken(),
+                LocalDateTime.now().plusSeconds(socialAuthToken.getExpiresIn()),
+                provider == SocialProvider.NAVER ? null : LocalDateTime.now().plusSeconds(socialAuthToken.getRefreshTokenExpiresIn())
+        );
     }
 
-    public static Member of(JoinForm joinForm, String password, MemberRoleType role) {
-        return Member.builder()
-                .email(joinForm.email())
-                .password(password)
-                .username(joinForm.username())
-                .phoneNumber(joinForm.phoneNumber())
-                .role(role)
-                .build();
+    public void updateAuthProfile(String email, OAuthTokenResponse response) {
+        this.email = email;
+        this.socialAuthToken.updateToken(response);
     }
 
     public void connectBrand(String brand){
@@ -78,11 +81,6 @@ public class Member extends BaseTimeEntity {
 
     public void connectAddress(String address) {
         this.address = address;
-    }
-
-    public void connectBank(String bankName, String bankAccount) {
-        this.bankName = bankName;
-        this.bankAccount = bankAccount;
     }
 
     public void connectCash(long cash){
@@ -102,9 +100,5 @@ public class Member extends BaseTimeEntity {
     public void addTag(FavoriteTag tag){
         getTags().add(tag);
         tag.connectMember(this);
-    }
-
-    public void updateRecentlyAccessDate(LocalDateTime dateTime) {
-        this.recentlyAccessDate = dateTime;
     }
 }

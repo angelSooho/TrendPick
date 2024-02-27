@@ -11,10 +11,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.servlet.LocaleResolver;
 import project.trendpick_pro.domain.member.entity.Member;
-import project.trendpick_pro.domain.member.entity.MemberRoleType;
+import project.trendpick_pro.domain.member.entity.MemberRole;
 import project.trendpick_pro.domain.member.exception.MemberNotFoundException;
 import project.trendpick_pro.domain.member.exception.MemberNotMatchException;
-import project.trendpick_pro.domain.member.service.MemberService;
 import project.trendpick_pro.global.util.rsData.RsData;
 import project.trendpick_pro.global.util.Ut;
 
@@ -65,25 +64,33 @@ public class Rq {
         }
     }
     public Boolean checkMember() {
-        return getLogin().getRole().equals(MemberRoleType.MEMBER);
+        return getLogin().getRole().equals(MemberRole.MEMBER);
     }
     public Member getMember() {
         Member member = getLogin();
-        if (member.getRole().equals(MemberRoleType.MEMBER)) {
+        if (member.getRole().equals(MemberRole.MEMBER)) {
             return member;
         }
         throw new MemberNotMatchException("허용된 권한이 아닙니다.");
     }
 
     public Boolean admin() {
-        return getLogin().getRole().equals(MemberRoleType.ADMIN);
+        return getLogin().getRole().equals(MemberRole.ADMIN);
     }
     public Member getRollMember(){
-        return getLogin();
+        Member member=getLogin();
+        if(member.getRole().equals(MemberRole.MEMBER)){
+            return member;
+        } else if(member.getRole().equals(MemberRole.BRAND_ADMIN)){
+            return member;
+        } else if(member.getRole().equals(MemberRole.ADMIN)){
+            return member;
+        }
+        throw new MemberNotMatchException("허용된 권한이 아닙니다.");
     }
     public Member getBrandMember() {
         Member member = getLogin();
-        if (member.getRole().equals(MemberRoleType.BRAND_ADMIN)) {
+        if (member.getRole().equals(MemberRole.BRAND_ADMIN)) {
             return member;
         } throw new MemberNotMatchException("허용된 권한이 아닙니다.");
     }
@@ -92,7 +99,7 @@ public class Rq {
     }
     public Member getAdmin() {
         Member checkMember = getLogin();
-        if (checkMember.getRole().equals(MemberRoleType.MEMBER)) {
+        if (checkMember.getRole().equals(MemberRole.MEMBER)) {
             throw new MemberNotMatchException("허용된 권한이 아닙니다.");
         }
         return checkMember;
@@ -101,11 +108,11 @@ public class Rq {
         if(!checkLogin()) {
             return false;
         } else {
-            return !getLogin().getRole().equals(MemberRoleType.MEMBER);
+            return !getLogin().getRole().equals(MemberRole.MEMBER);
         }
     }
     public Boolean checkBrand() {
-        return getLogin().getRole().equals(MemberRoleType.BRAND_ADMIN);
+        return getLogin().getRole().equals(MemberRole.BRAND_ADMIN);
     }
 
     public String getBrandName(){

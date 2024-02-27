@@ -15,27 +15,23 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.data.RepositoryItemReader;
 import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
-import org.springframework.batch.item.database.JdbcBatchItemWriter;
-import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.PlatformTransactionManager;
 import project.trendpick_pro.domain.member.entity.Member;
-import project.trendpick_pro.domain.member.entity.MemberRoleType;
+import project.trendpick_pro.domain.member.entity.MemberRole;
 import project.trendpick_pro.domain.member.repository.MemberRepository;
 import project.trendpick_pro.domain.product.entity.product.Product;
 import project.trendpick_pro.domain.product.entity.product.dto.response.ProductByRecommended;
 import project.trendpick_pro.domain.product.exception.ProductNotFoundException;
 import project.trendpick_pro.domain.product.repository.ProductRepository;
-import project.trendpick_pro.domain.product.service.ProductService;
 import project.trendpick_pro.domain.recommend.entity.Recommend;
 import project.trendpick_pro.domain.recommend.repository.JdbcRecommendRepository;
 import project.trendpick_pro.domain.recommend.repository.RecommendRepository;
 import project.trendpick_pro.domain.tags.favoritetag.entity.FavoriteTag;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -90,7 +86,7 @@ public class MakeRecommendProductJobConfig {
                 .repository(memberRepository)
                 .methodName("findAllByRoleAndRecentlyAccessDateBetween")
                 .pageSize(10)
-                .arguments(Arrays.asList(MemberRoleType.MEMBER, fromDate, toDate))
+                .arguments(Arrays.asList(MemberRole.MEMBER, fromDate, toDate))
                 .sorts(Collections.singletonMap("id", Sort.Direction.DESC))
                 .build();
     }

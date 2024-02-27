@@ -9,7 +9,7 @@ import project.trendpick_pro.IntegrationTestSupport;
 import project.trendpick_pro.domain.coupon.entity.Coupon;
 import project.trendpick_pro.domain.coupon.entity.CouponCard;
 import project.trendpick_pro.domain.member.entity.Member;
-import project.trendpick_pro.domain.member.entity.MemberRoleType;
+import project.trendpick_pro.domain.member.entity.MemberRole;
 import project.trendpick_pro.domain.member.repository.MemberRepository;
 import project.trendpick_pro.domain.store.entity.Store;
 import project.trendpick_pro.domain.store.repository.StoreRepository;
@@ -54,7 +54,7 @@ class CouponCardRepositoryTest extends IntegrationTestSupport {
                 .password("12345")
                 .username("TrendPick")
                 .phoneNumber("010-1234-5678")
-                .role(MemberRoleType.MEMBER)
+                .role(MemberRole.MEMBER)
                 .brand("Polo")
                 .build();
         Member savedMember = memberRepository.save(member);
@@ -92,7 +92,7 @@ class CouponCardRepositoryTest extends IntegrationTestSupport {
                 .password("12345")
                 .username("TrendPick")
                 .phoneNumber("010-1234-5678")
-                .role(MemberRoleType.MEMBER)
+                .role(MemberRole.MEMBER)
                 .brand("Polo")
                 .build();
         Member savedMember = memberRepository.save(member);

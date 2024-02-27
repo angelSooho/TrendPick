@@ -55,7 +55,7 @@ public class Review extends BaseTimeEntity {
 
     public static Review of(ReviewSaveRequest reviewSaveRequest, Member member, Product product, CommonFile file) {
         return Review.builder()
-                .writer(member.getUsername())
+                .writer(member.getNickName())
                 .product(product)
                 .file(file)
                 .title(reviewSaveRequest.title())

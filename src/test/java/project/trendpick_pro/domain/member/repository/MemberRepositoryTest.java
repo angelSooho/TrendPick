@@ -7,8 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import project.trendpick_pro.IntegrationTestSupport;
 import project.trendpick_pro.domain.member.entity.Member;
-import project.trendpick_pro.domain.member.entity.MemberRoleType;
-import project.trendpick_pro.domain.member.exception.MemberNotFoundException;
+import project.trendpick_pro.domain.member.entity.MemberRole;
+import project.trendpick_pro.global.exception.BaseException;
+import project.trendpick_pro.global.exception.ErrorCode;
 
 import java.util.List;
 
@@ -34,12 +35,12 @@ class MemberRepositoryTest extends IntegrationTestSupport {
         memberRepository.saveAll(List.of(member1, member2));
 
         //when
-        Member findMember = memberRepository.findByUsername(member2.getUsername())
-                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자 입니다."));
+        Member findMember = memberRepository.findByUsername(member2.getNickName())
+                .orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND));
 
         //then
         assertThat(findMember).isNotNull();
-        assertThat(findMember.getUsername()).isEqualTo(member2.getUsername());
+        assertThat(findMember.getNickName()).isEqualTo(member2.getNickName());
     }
 
     @DisplayName("저장된 멤버 객체를 이메일로 찾을 수 있다.")
@@ -52,7 +53,7 @@ class MemberRepositoryTest extends IntegrationTestSupport {
 
         //when
         Member findMember = memberRepository.findByEmail(member2.getEmail())
-                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자 입니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND));
 
         //then
         assertThat(findMember).isNotNull();
@@ -67,7 +68,7 @@ class MemberRepositoryTest extends IntegrationTestSupport {
         memberRepository.saveAll(List.of(member1, member2));
 
         //when
-        Member findMember = memberRepository.findByBrand(member2.getBrand());
+        Member findMember = memberRepository.findByBrand(member2.getBrand()).orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND));
 
         //then
         assertThat(findMember).isNotNull();
@@ -77,12 +78,10 @@ class MemberRepositoryTest extends IntegrationTestSupport {
     private Member createMember(String userName, String email, String brand) {
         return Member.builder()
                 .email(email)
-                .password("12345")
-                .username(userName)
+                .nickName(userName)
                 .phoneNumber("010-1234-5678")
-                .role(MemberRoleType.MEMBER)
+                .role(MemberRole.MEMBER)
                 .brand(brand)
                 .build();
     }
-
 }
