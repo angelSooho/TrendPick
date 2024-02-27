@@ -18,14 +18,13 @@ import project.trendpick_pro.domain.category.repository.SubCategoryRepository;
 import project.trendpick_pro.domain.common.file.CommonFile;
 import project.trendpick_pro.domain.delivery.entity.Delivery;
 import project.trendpick_pro.domain.member.entity.Member;
-import project.trendpick_pro.domain.member.entity.MemberRoleType;
+import project.trendpick_pro.domain.member.entity.MemberRole;
 import project.trendpick_pro.domain.member.repository.MemberRepository;
 import project.trendpick_pro.domain.orders.entity.Order;
 import project.trendpick_pro.domain.orders.entity.OrderItem;
 import project.trendpick_pro.domain.orders.entity.dto.request.OrderSearchCond;
 import project.trendpick_pro.domain.orders.entity.dto.response.OrderResponse;
 import project.trendpick_pro.domain.product.entity.product.Product;
-import project.trendpick_pro.domain.product.entity.product.ProductStatus;
 import project.trendpick_pro.domain.product.entity.productOption.ProductOption;
 import project.trendpick_pro.domain.product.repository.ProductRepository;
 
@@ -108,7 +107,7 @@ class OrderRepositoryTest extends IntegrationTestSupport {
                 .password("12345")
                 .username("TrendPick")
                 .phoneNumber("010-1234-5678")
-                .role(MemberRoleType.MEMBER)
+                .role(MemberRole.MEMBER)
                 .brand("Polo")
                 .build();
         Member savedMember = memberRepository.save(member);
@@ -193,7 +192,7 @@ class OrderRepositoryTest extends IntegrationTestSupport {
                 .password("12345")
                 .username("TrendPick")
                 .phoneNumber("010-1234-5678")
-                .role(MemberRoleType.MEMBER)
+                .role(MemberRole.MEMBER)
                 .brand("Polo")
                 .build();
         Member savedMember = memberRepository.save(member);
@@ -303,7 +302,7 @@ class OrderRepositoryTest extends IntegrationTestSupport {
                 .password("12345")
                 .username("TrendPick")
                 .phoneNumber("010-1234-5678")
-                .role(MemberRoleType.MEMBER)
+                .role(MemberRole.MEMBER)
                 .brand("Polo")
                 .build();
         Member savedMember = memberRepository.save(member);

@@ -25,7 +25,7 @@ class MemberTest {
                 .password("12345")
                 .username("TrendPick")
                 .phoneNumber("010-1234-5678")
-                .role(MemberRoleType.MEMBER)
+                .role(MemberRole.MEMBER)
                 .brand("Polo")
                 .build();
 

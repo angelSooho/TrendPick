@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.trendpick_pro.domain.cash.entity.CashLog;
-import project.trendpick_pro.domain.member.service.MemberService;
 import project.trendpick_pro.domain.orders.entity.OrderItem;
 import project.trendpick_pro.domain.orders.service.OrderService;
 import project.trendpick_pro.domain.rebate.entity.RebateOrderItem;

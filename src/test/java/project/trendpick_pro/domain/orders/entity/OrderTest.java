@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import project.trendpick_pro.domain.delivery.entity.Delivery;
 import project.trendpick_pro.domain.member.entity.Member;
-import project.trendpick_pro.domain.member.entity.MemberRoleType;
+import project.trendpick_pro.domain.member.entity.MemberRole;
 import project.trendpick_pro.domain.product.entity.product.Product;
 import project.trendpick_pro.domain.product.entity.productOption.ProductOption;
 
@@ -37,7 +37,7 @@ class OrderTest {
                 .password("12345")
                 .username("TrendPick")
                 .phoneNumber("010-1234-5678")
-                .role(MemberRoleType.MEMBER)
+                .role(MemberRole.MEMBER)
                 .brand("Polo")
                 .build();
         List<OrderItem> orderItems = List.of(
@@ -76,7 +76,7 @@ class OrderTest {
                 .password("12345")
                 .username("TrendPick")
                 .phoneNumber("010-1234-5678")
-                .role(MemberRoleType.MEMBER)
+                .role(MemberRole.MEMBER)
                 .brand("Polo")
                 .build();
         List<OrderItem> orderItems = List.of(
@@ -119,7 +119,7 @@ class OrderTest {
                 .password("12345")
                 .username("TrendPick")
                 .phoneNumber("010-1234-5678")
-                .role(MemberRoleType.MEMBER)
+                .role(MemberRole.MEMBER)
                 .brand("Polo")
                 .build();
         List<OrderItem> orderItems = List.of(
@@ -160,7 +160,7 @@ class OrderTest {
                 .password("12345")
                 .username("TrendPick")
                 .phoneNumber("010-1234-5678")
-                .role(MemberRoleType.MEMBER)
+                .role(MemberRole.MEMBER)
                 .brand("Polo")
                 .build();
         List<OrderItem> orderItems = List.of(

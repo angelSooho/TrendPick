@@ -9,7 +9,6 @@ import project.trendpick_pro.domain.coupon.entity.Coupon;
 import project.trendpick_pro.domain.coupon.entity.dto.request.StoreCouponSaveRequest;
 import project.trendpick_pro.domain.coupon.entity.dto.response.CouponResponse;
 import project.trendpick_pro.domain.coupon.repository.CouponRepository;
-import project.trendpick_pro.domain.coupon.service.CouponService;
 import project.trendpick_pro.domain.product.repository.ProductRepository;
 import project.trendpick_pro.domain.product.service.ProductService;
 import project.trendpick_pro.domain.store.entity.Store;

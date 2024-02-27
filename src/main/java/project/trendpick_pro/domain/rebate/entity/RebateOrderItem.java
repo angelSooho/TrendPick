@@ -105,7 +105,7 @@ public class RebateOrderItem extends BaseTimeEntity {
 
         // 구매자 추가 데이터
         buyer=orderItem.getOrder().getMember();
-        buyerName=orderItem.getOrder().getMember().getUsername();
+        buyerName=orderItem.getOrder().getMember().getNickName();
 
         // 판매자 추가 데이터
         seller=orderItem.getProduct().getProductOption().getBrand();
@@ -145,7 +145,7 @@ public class RebateOrderItem extends BaseTimeEntity {
         productSubject=item.getProduct().getTitle();
         orderItemCreateDate=item.getOrder().getCreatedDate();
         buyer=item.getOrder().getMember();
-        buyerName=item.getOrder().getMember().getUsername();
+        buyerName=item.getOrder().getMember().getNickName();
         seller=item.getProduct().getProductOption().getBrand();
         sellerName=item.getProduct().getProductOption().getBrand().getName();
     }

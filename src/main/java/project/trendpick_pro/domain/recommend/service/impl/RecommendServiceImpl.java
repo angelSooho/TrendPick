@@ -36,7 +36,7 @@ public class RecommendServiceImpl implements RecommendService {
 
     public Page<ProductListResponse> getFindAll(Member member, int offset){
         PageRequest pageable = PageRequest.of(offset, 18);
-        return recommendRepository.findAllByEmail(member.getUsername(), pageable);
+        return recommendRepository.findAllByEmail(member.getNickName(), pageable);
     }
 
     @Transactional

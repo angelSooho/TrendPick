@@ -46,7 +46,7 @@ public class ReviewController {
     public String showReview(@PathVariable Long reviewId, Model model){
         if (rq.checkLogin() && !rq.checkAdmin()) {
             Member checkMember = rq.getMember();
-            String writer = checkMember.getUsername();
+            String writer = checkMember.getNickName();
             model.addAttribute("currentUser", writer);
         }
         model.addAttribute("reviewResponse", reviewService.getReview(reviewId));
@@ -83,7 +83,7 @@ public class ReviewController {
 
         if (rq.checkLogin() && !rq.checkAdmin()) {
             Member checkMember = rq.getMember();
-            String currentUser = checkMember.getUsername();
+            String currentUser = checkMember.getNickName();
             model.addAttribute("currentUser", currentUser);
         }
         return "trendpick/review/list";
@@ -92,7 +92,7 @@ public class ReviewController {
     @GetMapping("/user")
     public String showOwnReview(Pageable pageable, Model model){
         Member checkMember = rq.getLogin();
-        String writer = checkMember.getUsername();
+        String writer = checkMember.getNickName();
         Page<ReviewResponse> reviewResponses = reviewService.showOwnReview(writer, pageable);
         model.addAttribute("reviewResponses", reviewResponses);
         model.addAttribute("currentUser", writer);

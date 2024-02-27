@@ -3,7 +3,7 @@ package project.trendpick_pro.domain.orders.entity.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import project.trendpick_pro.domain.member.entity.dto.response.MemberInfoResponse;
+import project.trendpick_pro.domain.member.entity.dto.MemberInfoResponse;
 import project.trendpick_pro.domain.orders.entity.dto.response.OrderItemDto;
 
 import java.text.NumberFormat;

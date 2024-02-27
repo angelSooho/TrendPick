@@ -11,9 +11,8 @@ import project.trendpick_pro.domain.ask.entity.dto.form.AskForm;
 import project.trendpick_pro.domain.ask.entity.dto.response.AskResponse;
 import project.trendpick_pro.domain.ask.exception.AskNotFoundException;
 import project.trendpick_pro.domain.ask.repository.AskRepository;
-import project.trendpick_pro.domain.ask.service.AskService;
 import project.trendpick_pro.domain.member.entity.Member;
-import project.trendpick_pro.domain.member.entity.MemberRoleType;
+import project.trendpick_pro.domain.member.entity.MemberRole;
 import project.trendpick_pro.domain.member.repository.MemberRepository;
 import project.trendpick_pro.domain.product.entity.product.Product;
 import project.trendpick_pro.domain.product.repository.ProductRepository;
@@ -53,7 +52,7 @@ class AskServiceTest extends IntegrationTestSupport {
                 .password("12345")
                 .username("TrendPick")
                 .phoneNumber("010-1234-5678")
-                .role(MemberRoleType.MEMBER)
+                .role(MemberRole.MEMBER)
                 .brand("Polo")
                 .build();
         Member savedMember = memberRepository.save(member);
@@ -90,7 +89,7 @@ class AskServiceTest extends IntegrationTestSupport {
                 .password("12345")
                 .username("TrendPick")
                 .phoneNumber("010-1234-5678")
-                .role(MemberRoleType.MEMBER)
+                .role(MemberRole.MEMBER)
                 .brand("Polo")
                 .build();
         Member savedMember = memberRepository.save(member);
@@ -133,7 +132,7 @@ class AskServiceTest extends IntegrationTestSupport {
                 .password("12345")
                 .username("TrendPick")
                 .phoneNumber("010-1234-5678")
-                .role(MemberRoleType.MEMBER)
+                .role(MemberRole.MEMBER)
                 .brand("Polo")
                 .build();
         Member savedMember = memberRepository.save(member);
@@ -186,7 +185,7 @@ class AskServiceTest extends IntegrationTestSupport {
                 .password("12345")
                 .username("TrendPick")
                 .phoneNumber("010-1234-5678")
-                .role(MemberRoleType.MEMBER)
+                .role(MemberRole.MEMBER)
                 .brand("Polo")
                 .build();
         Member savedMember = memberRepository.save(member);

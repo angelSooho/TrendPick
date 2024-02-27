@@ -2,16 +2,13 @@ package project.trendpick_pro.domain.ask.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import project.trendpick_pro.domain.answer.entity.form.AnswerForm;
-import project.trendpick_pro.domain.answer.service.AnswerService;
 import project.trendpick_pro.domain.ask.entity.dto.form.AskForm;
 import project.trendpick_pro.domain.ask.entity.dto.response.AskResponse;
-import project.trendpick_pro.domain.ask.service.AskService;
 import project.trendpick_pro.global.util.rq.Rq;
 import project.trendpick_pro.global.util.rsData.RsData;
 

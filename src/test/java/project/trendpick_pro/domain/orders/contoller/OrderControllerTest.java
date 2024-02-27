@@ -2,7 +2,6 @@ package project.trendpick_pro.domain.orders.contoller;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -11,7 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import project.trendpick_pro.ControllerTestSupport;
 import project.trendpick_pro.domain.member.entity.Member;
-import project.trendpick_pro.domain.member.entity.MemberRoleType;
+import project.trendpick_pro.domain.member.entity.MemberRole;
 import project.trendpick_pro.domain.orders.entity.dto.request.CartToOrderRequest;
 import project.trendpick_pro.domain.orders.entity.dto.request.ProductOrderRequest;
 import project.trendpick_pro.domain.orders.entity.dto.response.OrderDetailResponse;
@@ -21,7 +20,6 @@ import project.trendpick_pro.global.util.rsData.RsData;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -136,7 +134,7 @@ class OrderControllerTest extends ControllerTestSupport {
                 .password("12345")
                 .username("TrendPick")
                 .phoneNumber("010-1234-5678")
-                .role(MemberRoleType.MEMBER)
+                .role(MemberRole.MEMBER)
                 .brand("Polo")
                 .build();
 

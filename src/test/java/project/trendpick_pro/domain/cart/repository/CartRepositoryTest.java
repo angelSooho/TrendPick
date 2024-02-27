@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import project.trendpick_pro.domain.cart.entity.Cart;
 import project.trendpick_pro.domain.member.entity.Member;
-import project.trendpick_pro.domain.member.entity.MemberRoleType;
+import project.trendpick_pro.domain.member.entity.MemberRole;
 import project.trendpick_pro.domain.member.repository.MemberRepository;
 @DataJpaTest
 class CartRepositoryTest {
@@ -26,7 +26,7 @@ class CartRepositoryTest {
                 .password("12345")
                 .username("TrendPick")
                 .phoneNumber("010-1234-5678")
-                .role(MemberRoleType.MEMBER)
+                .role(MemberRole.MEMBER)
                 .brand("Polo")
                 .build());
 

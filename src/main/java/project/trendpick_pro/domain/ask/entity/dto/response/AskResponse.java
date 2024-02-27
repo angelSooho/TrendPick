@@ -41,7 +41,7 @@ public class AskResponse implements Serializable {
     public static AskResponse of (Ask ask) {
         return AskResponse.builder()
                 .askId(ask.getId())
-                .memberName(ask.getAuthor().getUsername())
+                .memberName(ask.getAuthor().getNickName())
                 .memberId(ask.getAuthor().getId())
                 .productId(ask.getProduct().getId())
                 .productName(ask.getProduct().getTitle())

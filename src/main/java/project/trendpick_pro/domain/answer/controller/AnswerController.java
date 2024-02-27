@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import project.trendpick_pro.domain.answer.entity.form.AnswerForm;
-import project.trendpick_pro.domain.answer.service.AnswerService;
 import project.trendpick_pro.global.util.rq.Rq;
 import project.trendpick_pro.global.util.rsData.RsData;
 

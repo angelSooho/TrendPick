@@ -14,15 +14,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.trendpick_pro.domain.ask.entity.dto.response.AskResponse;
-import project.trendpick_pro.domain.ask.service.AskService;
-import project.trendpick_pro.domain.brand.service.BrandService;
-import project.trendpick_pro.domain.category.service.MainCategoryService;
-import project.trendpick_pro.domain.category.service.SubCategoryService;
-import project.trendpick_pro.global.basedata.tagname.service.impl.TagNameServiceImpl;
+import project.trendpick_pro.global.basedata.tagname.service.TagNameService;
 import project.trendpick_pro.global.util.rq.Rq;
 import project.trendpick_pro.global.kafka.view.service.ViewService;
 import project.trendpick_pro.domain.member.entity.Member;
-import project.trendpick_pro.domain.member.service.MemberService;
 import project.trendpick_pro.domain.product.entity.dto.ProductRequest;
 import project.trendpick_pro.domain.product.entity.product.dto.response.ProductListResponse;
 import project.trendpick_pro.domain.product.entity.product.dto.response.ProductListResponseBySeller;
@@ -51,7 +46,7 @@ public class ProductController {
     private final RecommendService recommendService;
     private final MemberService memberService;
 
-    private final TagNameServiceImpl tagNameServiceImpl;
+    private final TagNameService tagNameService;
     private final BrandService brandService;
 
     private final MainCategoryService mainCategoryService;
@@ -192,7 +187,7 @@ public class ProductController {
     }
 
     private void readyHtml(Model model) {
-        model.addAttribute("tags", tagNameServiceImpl.findAll());
+        model.addAttribute("tags", tagNameService.findAll());
 
         List<String> MainCategories = mainCategoryService.findAll();
         model.addAttribute("mainCategories", MainCategories);

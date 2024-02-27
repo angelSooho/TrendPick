@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import project.trendpick_pro.domain.cart.entity.Cart;
 import project.trendpick_pro.domain.cart.entity.CartItem;
 import project.trendpick_pro.domain.member.entity.Member;
-import project.trendpick_pro.domain.member.entity.MemberRoleType;
+import project.trendpick_pro.domain.member.entity.MemberRole;
 import project.trendpick_pro.domain.product.entity.product.Product;
 import project.trendpick_pro.domain.product.entity.productOption.ProductOption;
 import project.trendpick_pro.domain.product.exception.ProductStockOutException;
@@ -92,7 +92,7 @@ class OrderItemTest {
                 .password("12345")
                 .username("TrendPick")
                 .phoneNumber("010-1234-5678")
-                .role(MemberRoleType.MEMBER)
+                .role(MemberRole.MEMBER)
                 .brand("Polo")
                 .build();
 
@@ -139,7 +139,7 @@ class OrderItemTest {
                 .password("12345")
                 .username("TrendPick")
                 .phoneNumber("010-1234-5678")
-                .role(MemberRoleType.MEMBER)
+                .role(MemberRole.MEMBER)
                 .brand("Polo")
                 .build();
 

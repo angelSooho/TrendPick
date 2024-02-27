@@ -8,7 +8,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import project.trendpick_pro.global.util.rq.Rq;
 import project.trendpick_pro.domain.coupon.entity.dto.request.StoreCouponSaveRequest;
-import project.trendpick_pro.domain.coupon.service.CouponService;
 import project.trendpick_pro.global.util.rsData.RsData;
 
 @Controller
