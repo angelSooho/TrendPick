@@ -9,7 +9,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.trendpick_pro.domain.brand.entity.Brand;
 import project.trendpick_pro.domain.brand.service.BrandService;
+import project.trendpick_pro.domain.cash.entity.CashLog;
+import project.trendpick_pro.domain.cash.entity.dto.CashResponse;
 import project.trendpick_pro.domain.cash.service.CashService;
 import project.trendpick_pro.domain.common.file.JsonConvertor;
 import project.trendpick_pro.domain.common.file.NickName;
@@ -20,7 +23,7 @@ import project.trendpick_pro.domain.member.entity.SocialProvider;
 import project.trendpick_pro.domain.member.entity.dto.MemberInfoResponse;
 import project.trendpick_pro.domain.member.repository.MemberRepository;
 import project.trendpick_pro.domain.recommend.service.RecommendService;
-import project.trendpick_pro.domain.store.service.StoreService;
+import project.trendpick_pro.domain.store.entity.Store;
 import project.trendpick_pro.domain.tags.favoritetag.entity.FavoriteTag;
 import project.trendpick_pro.domain.tags.tag.entity.dto.request.TagRequest;
 import project.trendpick_pro.global.crypto.jwt.JwtToken.JwtTokenService;
@@ -73,6 +76,7 @@ public class MemberService  {
                 .socialAuthToken(response)
                 .brand(brand)
                 .build();
+        settingMember(member, brand, null);
         return memberRepository.save(member);
     }
 
@@ -165,10 +169,6 @@ public class MemberService  {
         return memberRepository.findByEmail(email).orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND, "해당 이메일로 가입된 회원이 없습니다."));
     }
 
-    public Member findByBrandMember(String name){
-        return memberRepository.findByBrand(name).orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND, "해당 브랜드의 관리자가 없습니다."));
-    }
-
     public String generatedNickName() {
         String jsonContent = new File(oAuthClientProperties.getNameJson()).toString();
         NickName nickName = jsonConvertor.readValue(jsonContent, NickName.class);
@@ -176,50 +176,43 @@ public class MemberService  {
         NickName.Last last = nickName.last().get(ThreadLocalRandom.current().nextInt(nickName.first().size()));
         return first.getName() + " " + last.getName();
     }
-//
-//    @Transactional
-//    public RsData<CashResponse> addCash(String brand, long price, Brand relEntity, CashLog.EvenType eventType) {
-//        Member member=findByBrandMember(brand);
-//        if(!member.getBrand().equals(brand)){
-//            return RsData.of("F-1","해당 브랜드와 관리자가 일치하지 않습니다.");
-//        }
-//        CashLog cashLog = cashService.addCash(member, price, relEntity.getName(),relEntity.getId(), eventType);
-//
-//        long newRestCash = getRestCash(member) + cashLog.getPrice();
-//        member.connectCash(newRestCash);
-//
-//        return RsData.of("S-1", "성공", new CashResponse(cashLog, newRestCash));
-//    }
-//
-//    public long getRestCash(Member member) {
-//        return memberRepository.findById(member.getId()).get().getRestCash();
-//    }
-//
-//    private void checkingMemberType(Member member) {
-//        if (member.getRole() == MemberRole.MEMBER) {
-//            recommendService.rankRecommend(member);
-//        }
-//    }
-//
-//    private Member settingMember(JoinForm joinForm) {
-//        MemberRole memberRole = MemberRole.getRoleType(joinForm.state());
-//        Member member = Member.of(joinForm, passwordEncoder.encode(joinForm.password()), memberRole);
-//        if (memberRole == MemberRole.BRAND_ADMIN) {
-//            member.connectBrand(joinForm.brand());
-//            saveBrandAndStoreIfNotExists(joinForm.brand());
-//        }
-//        if (joinForm.tags() != null) {
-//            member.changeTags(createFavoriteTags(joinForm.tags()));
-//        }
-//        return member;
-//    }
-//
-//    private void saveBrandAndStoreIfNotExists(String brand) {
-//        if (!brandService.isPresent(brand)) {
-//            brandService.save(brand);
-//            storeService.save(new Store(brand));
-//        }
-//    }
+
+    @Transactional
+    public CashResponse addCash(String brand, long price, Brand relEntity, CashLog.EvenType eventType) {
+        Member member= memberRepository.findByBrand(brand).orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND, "해당 브랜드로 가입된 회원이 없습니다."));
+
+        long newRestCash = getRestCash(member) + price;
+        member.connectCash(newRestCash);
+        return new CashResponse(new CashLog());
+    }
+
+    public long getRestCash(Member member) {
+        return memberRepository.findById(member.getId()).get().getRestCash();
+    }
+
+    private void checkingMemberType(Member member) {
+        if (member.getRole() == MemberRole.MEMBER) {
+            recommendService.rankRecommend(member);
+        }
+    }
+
+    private Member settingMember(Member member, String brand, List<String> tags) {
+        if (member.getRole() == MemberRole.BRAND_ADMIN) {
+            member.connectBrand(brand);
+            saveBrandAndStoreIfNotExists(brand);
+        }
+        if (tags != null) {
+            member.changeTags(createFavoriteTags(tags));
+        }
+        return member;
+    }
+
+    private void saveBrandAndStoreIfNotExists(String brand) {
+        if (!brandService.isPresent(brand)) {
+            brandService.save(brand);
+            storeService.save(new Store(brand));
+        }
+    }
 
     private Set<FavoriteTag> createFavoriteTags(List<String> tagList) {
         return tagList.stream()

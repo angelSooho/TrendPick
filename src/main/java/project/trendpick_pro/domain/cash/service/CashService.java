@@ -1,14 +1,25 @@
 package project.trendpick_pro.domain.cash.service;
 
-
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.trendpick_pro.domain.cash.entity.CashLog;
-import project.trendpick_pro.domain.member.entity.Member;
+import project.trendpick_pro.domain.cash.repository.CashLogRepository;
 import project.trendpick_pro.domain.rebate.entity.RebateOrderItem;
 import project.trendpick_pro.domain.withdraw.entity.WithdrawApply;
 
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class CashService {
 
-public interface CashService {
-    CashLog addCashLog(WithdrawApply withdrawApply);
+    private final CashLogRepository cashLogRepository;
 
-    CashLog addCashLog(RebateOrderItem rebateOrderItem);
+    public CashLog addCashLog(WithdrawApply withdrawApply) {
+        return cashLogRepository.save(CashLog.of(withdrawApply));
+    }
+
+    public CashLog addCashLog(RebateOrderItem rebateOrderItem) {
+        return cashLogRepository.save(CashLog.of(rebateOrderItem));
+    }
 }

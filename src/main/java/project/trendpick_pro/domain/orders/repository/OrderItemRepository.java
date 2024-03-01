@@ -7,9 +7,10 @@ import project.trendpick_pro.domain.orders.entity.OrderItem;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
    Page<OrderItem> findAllByCreatedDateBetween(LocalDateTime fromDate, LocalDateTime toDate, Pageable pageable);
 
-    List<OrderItem> findAllByCreatedDateBetween(LocalDateTime fromDate, LocalDateTime toDate);
+    Optional<List<OrderItem>> findAllByCreatedDateBetween(LocalDateTime fromDate, LocalDateTime toDate);
 }

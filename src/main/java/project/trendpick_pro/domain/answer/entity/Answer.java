@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import project.trendpick_pro.domain.answer.entity.form.AnswerForm;
+import project.trendpick_pro.domain.answer.entity.dto.AnswerRequest;
 import project.trendpick_pro.domain.ask.entity.Ask;
 import project.trendpick_pro.domain.common.base.BaseTimeEntity;
 
@@ -29,7 +29,7 @@ public class Answer extends BaseTimeEntity {
         this.content = content;
     }
 
-    public static Answer write(String content) {
+    public static Answer of(String content) {
         return Answer.builder()
                 .content(content)
                 .build();
@@ -41,7 +41,7 @@ public class Answer extends BaseTimeEntity {
         this.ask = ask;
     }
 
-    public void update(AnswerForm answerForm) {
+    public void update(AnswerRequest answerForm) {
         this.content = answerForm.getContent();
     }
 }

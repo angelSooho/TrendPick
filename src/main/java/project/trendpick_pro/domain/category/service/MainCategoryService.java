@@ -9,25 +9,16 @@ import project.trendpick_pro.domain.category.repository.MainCategoryRepository;
 import java.util.ArrayList;
 import java.util.List;
 
-@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
-public class MainCategoryService implements MainCategoryService {
+@Transactional(readOnly = true)
+public class MainCategoryService {
 
     private final MainCategoryRepository mainCategoryRepository;
 
     @Transactional
     public void save(String name) {
         mainCategoryRepository.save(new MainCategory(name));
-    }
-
-    @Transactional
-    public void saveAll(List<String> name) {
-        List<MainCategory> list = new ArrayList<>();
-        for (String s : name) {
-            list.add(new MainCategory(s));
-        }
-        mainCategoryRepository.saveAll(list);
     }
 
     @Transactional
@@ -42,10 +33,6 @@ public class MainCategoryService implements MainCategoryService {
 
     public String findById(Long id) {
         return mainCategoryRepository.findById(id).orElseThrow().getName();
-    }
-
-    public MainCategory findByBaseId(Long id) {
-        return mainCategoryRepository.findById(id).orElseThrow();
     }
 
     public MainCategory findByName(String username) {

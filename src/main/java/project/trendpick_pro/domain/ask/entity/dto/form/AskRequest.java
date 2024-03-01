@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class AskForm {
+public class AskRequest {
 
     private Long productId;
     @NotBlank
@@ -16,7 +16,7 @@ public class AskForm {
     private String content;
 
     @Builder
-    public AskForm(Long productId, String title, String content) {
+    public AskRequest(Long productId, String title, String content) {
         this.productId = productId;
         this.title = title;
         this.content = content;

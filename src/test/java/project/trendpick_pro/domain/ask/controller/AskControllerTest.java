@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import project.trendpick_pro.ControllerTestSupport;
-import project.trendpick_pro.domain.ask.entity.dto.form.AskForm;
+import project.trendpick_pro.domain.ask.entity.dto.form.AskRequest;
 import project.trendpick_pro.domain.ask.entity.dto.response.AskResponse;
 import project.trendpick_pro.domain.member.entity.Member;
 import project.trendpick_pro.domain.member.entity.MemberRole;
@@ -31,7 +31,7 @@ class AskControllerTest extends ControllerTestSupport {
     void registerAsk() throws Exception {
         //given
         Member member = createMember();
-        AskForm request = AskForm.builder()
+        AskRequest request = AskRequest.builder()
                 .productId(1L)
                 .title("ask title")
                 .content("ask content")
@@ -56,7 +56,7 @@ class AskControllerTest extends ControllerTestSupport {
     void modifyAsk() throws Exception {
         //given
         Member member = createMember();
-        AskForm request = AskForm.builder()
+        AskRequest request = AskRequest.builder()
                 .productId(1L)
                 .title("ask title")
                 .content("ask content")

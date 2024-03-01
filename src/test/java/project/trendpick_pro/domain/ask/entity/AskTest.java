@@ -25,7 +25,7 @@ class AskTest {
         Ask ask = Ask.of("title", "content");
 
         //when
-        Answer answer = Answer.write("content");
+        Answer answer = Answer.of("content");
         answer.connectAsk(ask);
 
         //then

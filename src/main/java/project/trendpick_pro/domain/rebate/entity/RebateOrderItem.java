@@ -114,10 +114,7 @@ public class RebateOrderItem extends BaseTimeEntity {
         return (totalPrice*quantity - discountPrice) - (int)(totalPrice * 0.05); // 정산금액 수수료 5%(임의) 제외하고 계산
     }
     public boolean checkAlreadyRebate() {
-        if (rebateDate != null) {
-            return false;
-        }
-        return true;
+        return rebateDate == null;
     }
 
     public void setRebateDone(CashLog cashLog) {
@@ -148,5 +145,3 @@ public class RebateOrderItem extends BaseTimeEntity {
         sellerName=item.getProduct().getProductOption().getBrand().getName();
     }
 }
-
-

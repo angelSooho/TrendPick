@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import project.trendpick_pro.domain.orders.entity.Order;
 
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
@@ -46,6 +47,25 @@ public class OrderResponse {
         this.color = color;
         this.orderStatus = orderStatus;
         this.deliveryStatus = deliveryStatus;
+    }
+
+    public static OrderResponse of(Order order) {
+        return OrderResponse.builder()
+                .orderId(order.getId())
+                .productId(order.getOrderItems().get(0).getProduct().getId())
+                .productFilePath(order.getOrderItems().get(0).getProduct().getProductOption().getFile().getFileName())
+                .brandName(order.getMember().getBrand())
+                .productName(order.getOrderItems().get(0).getProduct().getTitle())
+                .count(order.getOrderItems().get(0).getQuantity())
+                .productPrice(order.getOrderItems().get(0).getOrderPrice())
+                .discountPrice(order.getOrderItems().get(0).getDiscountPrice())
+                .orderDate(order.getCreatedDate())
+                .canceledDate(LocalDateTime.now())
+                .size(order.getOrderItems().get(0).getSize())
+                .color(order.getOrderItems().get(0).getColor())
+                .orderStatus(order.getOrderStatus().name())
+                .deliveryStatus(order.getDelivery().getAddress())
+                .build();
     }
 
     public int getTotalPrice(){

@@ -7,8 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.trendpick_pro.domain.common.base.BaseTimeEntity;
 import project.trendpick_pro.domain.member.entity.Member;
-import project.trendpick_pro.domain.notification.exception.NotificationTypeNotMatchException;
 import project.trendpick_pro.domain.orders.entity.Order;
+import project.trendpick_pro.global.exception.BaseException;
+import project.trendpick_pro.global.exception.ErrorCode;
 
 import java.util.Objects;
 
@@ -16,6 +17,7 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Notification extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "notification_id")
@@ -46,13 +48,8 @@ public class Notification extends BaseTimeEntity {
         if (object instanceof Order) {
             return createOrderNotification(member, (Order) object);
         }
-        throw new NotificationTypeNotMatchException("알림 타입이 일치하지 않습니다.");
+        throw new BaseException(ErrorCode.BAD_REQUEST, "알림 타입이 일치하지 않습니다.");
     }
-
-    public void updateNotificationType(String notificationType, String deliveryState){
-        this.notificationType=checkNotificationType(notificationType);
-        this.deliveryState=deliveryState;
-     }
 
      public boolean validateNotificationType(String notificationType){
         return Objects.equals(this.notificationType.getValue(), checkNotificationType(notificationType).getValue());
@@ -71,7 +68,7 @@ public class Notification extends BaseTimeEntity {
         if (object instanceof Order) {
             return checkOrderNotificationType((Order) object);
         }
-        throw new NotificationTypeNotMatchException("알림 타입이 일치하지 않습니다.");
+        throw new BaseException(ErrorCode.BAD_REQUEST, "알림 타입이 일치하지 않습니다.");
     }
 
     private static NotificationType checkOrderNotificationType(Order order) {

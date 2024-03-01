@@ -2,57 +2,49 @@ package project.trendpick_pro.domain.coupon.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import project.trendpick_pro.global.util.rq.Rq;
 import project.trendpick_pro.domain.coupon.entity.dto.response.CouponCardByApplyResponse;
-import project.trendpick_pro.global.util.rsData.RsData;
+import project.trendpick_pro.domain.coupon.service.CouponCardService;
+import project.trendpick_pro.domain.member.controller.annotation.MemberEmail;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@RequestMapping("/trendpick/usr/couponCards")
+@RestController
 @RequiredArgsConstructor
-@Controller
+@RequestMapping("/api/couponcards")
 public class CouponCardController {
 
-    private final Rq rq;
     private final CouponCardService couponCardService;
 
     @PreAuthorize("hasRole('MEMBER')")
     @PostMapping("/{couponId}/issue")
-    public String issueCoupon(@PathVariable("couponId") Long couponId, HttpServletRequest req) {
-        RsData result = couponCardService.issue(rq.getMember(), couponId, LocalDateTime.now());
-        return processRequest(result, "쿠폰이 발급 되었습니다.", req);
+    public ResponseEntity<Void> issueCoupon(
+            @MemberEmail String email,
+            @PathVariable("couponId") Long couponId) {
+        couponCardService.issue(email, couponId, LocalDateTime.now());
+        return ResponseEntity.ok().build();
     }
 
     @PreAuthorize("hasRole('MEMBER')")
-    @GetMapping("/apply")
-    @ResponseBody
-    public List<CouponCardByApplyResponse> showApplicableCoupons(@RequestParam("orderItem") Long orderItemId) {
-        return couponCardService.showCouponCardsByOrderItem(orderItemId);
+    @GetMapping
+    public ResponseEntity<List<CouponCardByApplyResponse>> get(@RequestParam("orderItem") Long orderItemId) {
+        return ResponseEntity.ok().body(couponCardService.getCouponsByOrdered(orderItemId));
     }
 
     @PreAuthorize("hasRole('MEMBER')")
     @PostMapping("/apply")
-    public String applyCoupon(@RequestParam("couponCard") Long couponCardId, @RequestParam("orderItem") Long orderItemId, HttpServletRequest req) {
-        RsData result = couponCardService.apply(couponCardId, orderItemId, LocalDateTime.now());
-        return processRequest(result, "쿠폰이 적용되었습니다.", req);
+    public ResponseEntity<Void> apply(HttpServletRequest req, @RequestParam("couponCard") Long couponCardId, @RequestParam("orderItem") Long orderItemId) {
+        couponCardService.apply(couponCardId, orderItemId);
+        return ResponseEntity.ok().build();
     }
 
     @PreAuthorize("hasRole('MEMBER')")
     @PostMapping("/cancel")
-    public String cancelCoupon(@RequestParam("orderItem") Long orderItemId, HttpServletRequest req) {
-        RsData result = couponCardService.cancel(orderItemId);
-        return processRequest(result, "쿠폰 적용이 취소되었습니다.", req);
-    }
-
-    private String processRequest(RsData result, String successMsg, HttpServletRequest req) {
-        if(result.isFail()) {
-            return rq.historyBack(result);
-        }
-        String referer = req.getHeader("referer");
-        return rq.redirectWithMsg(referer, successMsg);
+    public ResponseEntity<Void> cancelCoupon(@RequestParam("orderItem") Long orderItemId, HttpServletRequest req) {
+        couponCardService.cancel(orderItemId);
+        return ResponseEntity.ok().build();
     }
 }

@@ -1,4 +1,4 @@
-package project.trendpick_pro.domain.answer.entity.dto.response;
+package project.trendpick_pro.domain.answer.entity.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

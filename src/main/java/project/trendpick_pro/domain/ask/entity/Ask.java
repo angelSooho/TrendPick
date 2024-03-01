@@ -3,7 +3,7 @@ package project.trendpick_pro.domain.ask.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import project.trendpick_pro.domain.answer.entity.Answer;
-import project.trendpick_pro.domain.ask.entity.dto.form.AskForm;
+import project.trendpick_pro.domain.ask.entity.dto.form.AskRequest;
 import project.trendpick_pro.domain.common.base.BaseTimeEntity;
 import project.trendpick_pro.domain.member.entity.Member;
 import project.trendpick_pro.domain.product.entity.product.Product;
@@ -64,9 +64,9 @@ public class Ask extends BaseTimeEntity {
         this.product = product;
     }
 
-    public void update(AskForm askForm) {
-        this.title = askForm.getTitle();
-        this.content = askForm.getContent();
+    public void update(AskRequest askRequest) {
+        this.title = askRequest.getTitle();
+        this.content = askRequest.getContent();
     }
     public void updateStatus(){
         this.status = AskStatus.COMPLETED;

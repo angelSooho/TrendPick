@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-public class StoreCouponSaveRequest {
+public class CouponSaveRequest {
 
     @NotBlank(message = "쿠폰 이름을 입력해주세요.")
     private String name;
@@ -33,9 +33,9 @@ public class StoreCouponSaveRequest {
     private Integer issueAfterDate;
 
     @Builder
-    private StoreCouponSaveRequest(String name, int limitCount, int limitIssueDate,
-                                  Integer minimumPurchaseAmount, int discountPercent,
-                                  String expirationType, LocalDateTime startDate, LocalDateTime endDate, Integer issueAfterDate) {
+    private CouponSaveRequest(String name, int limitCount, int limitIssueDate,
+                              Integer minimumPurchaseAmount, int discountPercent,
+                              String expirationType, LocalDateTime startDate, LocalDateTime endDate, Integer issueAfterDate) {
         this.name = name;
         this.limitCount = limitCount;
         this.limitIssueDate = limitIssueDate;

@@ -5,19 +5,20 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import project.trendpick_pro.domain.brand.entity.Brand;
 import project.trendpick_pro.domain.category.entity.MainCategory;
 import project.trendpick_pro.domain.category.entity.SubCategory;
 import project.trendpick_pro.domain.common.file.CommonFile;
 import project.trendpick_pro.domain.product.entity.product.ProductStatus;
 import project.trendpick_pro.domain.product.entity.productOption.dto.ProductOptionSaveRequest;
-import project.trendpick_pro.domain.product.exception.ProductStockOutException;
+import project.trendpick_pro.global.exception.BaseException;
+import project.trendpick_pro.global.exception.ErrorCode;
 
 import java.io.Serializable;
 import java.util.List;
 
-import static project.trendpick_pro.domain.product.entity.product.ProductStatus.*;
+import static project.trendpick_pro.domain.product.entity.product.ProductStatus.SALE;
+import static project.trendpick_pro.domain.product.entity.product.ProductStatus.SOLD_OUT;
 
 @Entity
 @Getter
@@ -109,7 +110,7 @@ public class ProductOption implements Serializable {
             return;
         }
         if (this.status == SOLD_OUT || this.stock - quantity < 0) {
-            throw new ProductStockOutException("재고가 부족 합니다.");
+            throw new BaseException(ErrorCode.BAD_REQUEST, "재고가 부족합니다.");
         }
         this.stock -= quantity;
     }

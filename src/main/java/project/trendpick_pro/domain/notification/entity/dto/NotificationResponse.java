@@ -1,6 +1,5 @@
-package project.trendpick_pro.domain.notification.entity.dto.response;
+package project.trendpick_pro.domain.notification.entity.dto;
 
-import com.querydsl.core.annotations.QueryProjection;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

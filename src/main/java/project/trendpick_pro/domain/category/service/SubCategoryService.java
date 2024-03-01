@@ -7,13 +7,12 @@ import project.trendpick_pro.domain.category.entity.MainCategory;
 import project.trendpick_pro.domain.category.entity.SubCategory;
 import project.trendpick_pro.domain.category.repository.SubCategoryRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@Transactional(readOnly = true)
-@RequiredArgsConstructor
 @Service
-public class SubCategoryService implements SubCategoryService {
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class SubCategoryService {
 
     private final SubCategoryRepository subCategoryRepository;
 
@@ -23,23 +22,12 @@ public class SubCategoryService implements SubCategoryService {
     }
 
     @Transactional
-    public void saveAll(List<String> name, MainCategory mainCategory){
-        List<SubCategory> list = new ArrayList<>();
-        for (String s : name) {
-            list.add(new SubCategory(s, mainCategory));
-        }
-        subCategoryRepository.saveAll(list);
-    }
-
-//    @CacheEvict(key = "#mainCategoryName", value = "subCategories")
-    @Transactional
     public void delete(Long id){
         SubCategory subCategory = subCategoryRepository.findById(id).orElseThrow();
         subCategoryRepository.delete(subCategory);
     }
 
-//    @Cacheable(key = "#mainCategoryName", value = "subCategories")
-    public List<String> findAll(String mainCategoryName) {
+    public List<String> getAll(String mainCategoryName) {
         List<SubCategory> categories;
         if (mainCategoryName.equals("전체")){
             categories = subCategoryRepository.findAllBy();
@@ -51,10 +39,6 @@ public class SubCategoryService implements SubCategoryService {
 
     public String findById(Long id){
         return subCategoryRepository.findById(id).orElseThrow().getName();
-    }
-
-    public SubCategory findByBaseId(Long id, MainCategory mainCategory){
-        return subCategoryRepository.findByIdInMainCategory(id, mainCategory);
     }
 
     public SubCategory findByName(String username){

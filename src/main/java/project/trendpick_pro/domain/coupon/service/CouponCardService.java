@@ -10,86 +10,78 @@ import project.trendpick_pro.domain.coupon.exception.CouponNotFoundException;
 import project.trendpick_pro.domain.coupon.repository.CouponCardRepository;
 import project.trendpick_pro.domain.coupon.repository.CouponRepository;
 import project.trendpick_pro.domain.member.entity.Member;
+import project.trendpick_pro.domain.member.service.MemberService;
 import project.trendpick_pro.domain.orders.entity.OrderItem;
 import project.trendpick_pro.domain.orders.exception.OrderItemNotFoundException;
 import project.trendpick_pro.domain.orders.repository.OrderItemRepository;
-import project.trendpick_pro.global.util.rsData.RsData;
+import project.trendpick_pro.global.exception.BaseException;
+import project.trendpick_pro.global.exception.ErrorCode;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Transactional(readOnly = true)
-@RequiredArgsConstructor
 @Service
-public class CouponCardService implements CouponCardService {
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class CouponCardService {
 
     private final CouponCardRepository couponCardRepository;
     private final CouponRepository couponRepository;
     private final OrderItemRepository orderItemRepository;
 
+    private final MemberService memberService;
+
     @Transactional
-    @Override
-    public RsData issue(Member member, Long couponId, LocalDateTime dateTime) {
+    public void issue(String email, Long couponId, LocalDateTime dateTime) {
+        Member member = memberService.findByEmail(email);
         Coupon coupon = couponRepository.findById(couponId).orElseThrow(
                 () -> new CouponNotFoundException("존재하지 않는 쿠폰입니다."));
         int count = couponCardRepository.countByCouponIdAndMemberId(couponId, member.getId());
 
-        RsData<CouponCard> of = validateCouponCard(count, coupon);
-        if (of != null) {
-            return of;
-        }
-
-        CouponCard savedCouponCard = settingCouponCard(member, dateTime, coupon);
-        return RsData.of("S-1", coupon.getName() + " 쿠폰이 발급되었습니다.");
+        validateCouponCard(count, coupon);
+        settingCouponCard(member, dateTime, coupon);
     }
 
     @Transactional
-    @Override
-    public RsData apply(Long couponCardId, Long orderItemId) {
+    public void apply(Long couponCardId, Long orderItemId) {
         OrderItem orderItem = orderItemRepository.findById(orderItemId).orElseThrow(
                 () -> new OrderItemNotFoundException("주문되지 않은 상품입니다."));
         CouponCard couponCard = couponCardRepository.findById(couponCardId).orElseThrow(
                 () -> new CouponNotFoundException("존재하지 않은 쿠폰입니다."));
         if (!couponCard.validate(orderItem, LocalDateTime.now()))
-            return RsData.of("F-1", "해당 주문상품에 적용된 쿠폰이 없습니다.");
+            throw new BaseException(ErrorCode.BAD_REQUEST, "쿠폰이 적용되지 않습니다.");
         couponCard.use(orderItem, LocalDateTime.now());
-        return RsData.of("S-1", "쿠폰이 적용되었습니다.");
     }
 
     @Transactional
-    @Override
-    public RsData cancel(Long orderItemId) {
+    public void cancel(Long orderItemId) {
         OrderItem orderItem = orderItemRepository.findById(orderItemId).orElseThrow(
                 () -> new OrderItemNotFoundException("주문되지 않은 상품입니다."));
         orderItem.getCouponCard().cancel(orderItem);
-        return RsData.of("S-1", "쿠폰이 취소되었습니다.");
     }
 
-    @Override
-    public List<CouponCardByApplyResponse> showCouponCardsByOrderItem(Long orderItemId) {
+    public List<CouponCardByApplyResponse> getCouponsByOrdered(Long orderItemId) {
         OrderItem orderItem = orderItemRepository.findById(orderItemId).orElseThrow(
                 () -> new OrderItemNotFoundException("주문되지 않은 상품입니다."));
         List<CouponCard> couponCards = couponCardRepository.findAllByBrand(orderItem.getProduct().getProductOption().getBrand().getName());
         return createCouponCardByApplyResponseList(couponCards, orderItem);
     }
 
-    private CouponCard settingCouponCard(Member member, LocalDateTime dateTime, Coupon coupon) {
+    private void settingCouponCard(Member member, LocalDateTime dateTime, Coupon coupon) {
         CouponCard couponCard = new CouponCard(coupon);
         couponCard.updatePeriod(dateTime);
-        CouponCard savedCouponCard = couponCardRepository.save(couponCard);
-        savedCouponCard.updatePeriod(dateTime);
-        savedCouponCard.connectMember(member);
-        return savedCouponCard;
+        couponCard.updatePeriod(dateTime);
+        couponCard.connectMember(member);
+        couponCardRepository.save(couponCard);
     }
 
-    private static RsData<CouponCard> validateCouponCard(int count, Coupon coupon) {
+    private static void validateCouponCard(int count, Coupon coupon) {
         if(count > 0)
-            return RsData.of("F-3", "이미 발급 받으신 쿠폰입니다.");
+            throw new BaseException(ErrorCode.BAD_REQUEST, "이미 발급된 쿠폰입니다.");
         if(!coupon.validateLimitCount())
-            return RsData.of("F-1", "수량이 모두 소진되었습니다.");
+            throw new BaseException(ErrorCode.BAD_REQUEST, "쿠폰 발급 가능 횟수를 초과하였습니다.");
         if(!coupon.validateLimitIssueDate(LocalDateTime.now()))
-            return RsData.of("F-2", "쿠폰 발급 가능 날짜가 지났습니다.");
-        return null;
+            throw new BaseException(ErrorCode.BAD_REQUEST, "쿠폰 발급 기간이 만료되었습니다.");
     }
 
     private List<CouponCardByApplyResponse> createCouponCardByApplyResponseList(List<CouponCard> couponCards, OrderItem orderItem) {
@@ -99,4 +91,3 @@ public class CouponCardService implements CouponCardService {
                 .toList();
     }
 }
-

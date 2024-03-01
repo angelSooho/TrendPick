@@ -20,7 +20,6 @@ import project.trendpick_pro.domain.product.entity.productOption.ProductOption;
 import project.trendpick_pro.domain.product.exception.ProductStockOutException;
 import project.trendpick_pro.domain.product.repository.ProductOptionRepository;
 import project.trendpick_pro.domain.product.repository.ProductRepository;
-import project.trendpick_pro.domain.product.service.ProductService;
 import project.trendpick_pro.global.redis.exception.RedisLockException;
 
 import java.util.List;

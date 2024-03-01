@@ -9,19 +9,19 @@ import project.trendpick_pro.domain.product.entity.productOption.dto.ProductOpti
 @NoArgsConstructor
 public class ProductRequest {
 
-    private ProductSaveRequest request1;
-    private ProductOptionSaveRequest request2;
+    private ProductSaveRequest saveRequest;
+    private ProductOptionSaveRequest optionSaveRequest;
 
-    public ProductRequest(ProductSaveRequest request1, ProductOptionSaveRequest request2) {
-        this.request1 = request1;
-        this.request2 = request2;
+    public ProductRequest(ProductSaveRequest saveRequest, ProductOptionSaveRequest optionSaveRequest) {
+        this.saveRequest = saveRequest;
+        this.optionSaveRequest = optionSaveRequest;
     }
 
-    public ProductSaveRequest getRequest1() {
-        return request1;
+    public ProductSaveRequest getSaveRequest() {
+        return saveRequest;
     }
 
-    public ProductOptionSaveRequest getRequest2() {
-        return request2;
+    public ProductOptionSaveRequest getOptionSaveRequest() {
+        return optionSaveRequest;
     }
 }

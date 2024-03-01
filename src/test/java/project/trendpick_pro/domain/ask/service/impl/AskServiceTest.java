@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import project.trendpick_pro.IntegrationTestSupport;
 import project.trendpick_pro.domain.ask.entity.Ask;
-import project.trendpick_pro.domain.ask.entity.dto.form.AskForm;
+import project.trendpick_pro.domain.ask.entity.dto.form.AskRequest;
 import project.trendpick_pro.domain.ask.entity.dto.response.AskResponse;
 import project.trendpick_pro.domain.ask.exception.AskNotFoundException;
 import project.trendpick_pro.domain.ask.repository.AskRepository;
@@ -65,12 +65,12 @@ class AskServiceTest extends IntegrationTestSupport {
         Product savedProduct = productRepository.save(product);
 
         //when
-        AskForm askForm = AskForm.builder()
+        AskRequest askRequest = AskRequest.builder()
                 .title("new title")
                 .content("new content")
                 .productId(savedProduct.getId())
                 .build();
-        Long askId = askService.register(savedMember, askForm).getData();
+        Long askId = askService.register(savedMember, askRequest).getData();
         Ask findAsk = askRepository.findById(askId).orElseThrow(() -> new AskNotFoundException("해당 문의가 존재하지 않습니다."));
 
         //then
@@ -101,20 +101,20 @@ class AskServiceTest extends IntegrationTestSupport {
                 .build();
         Product savedProduct = productRepository.save(product);
 
-        AskForm askForm = AskForm.builder()
+        AskRequest askRequest = AskRequest.builder()
                 .title("new title")
                 .content("new content")
                 .productId(savedProduct.getId())
                 .build();
-        Long askId = askService.register(savedMember, askForm).getData();
+        Long askId = askService.register(savedMember, askRequest).getData();
 
         //when
-        AskForm modifyAskForm = AskForm.builder()
+        AskRequest modifyAskRequest = AskRequest.builder()
                 .title("modified title")
                 .content("modified content")
                 .productId(savedProduct.getId())
                 .build();
-        AskResponse modifyAsk = askService.modify(savedMember, askId, modifyAskForm).getData();
+        AskResponse modifyAsk = askService.modify(savedMember, askId, modifyAskRequest).getData();
 
         //then
         assertThat(modifyAsk.getAskId()).isNotNull();

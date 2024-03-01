@@ -5,8 +5,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
+import project.trendpick_pro.domain.ask.entity.dto.response.AskResponse;
 import project.trendpick_pro.domain.common.file.CommonFile;
 import project.trendpick_pro.domain.product.entity.product.Product;
+import project.trendpick_pro.domain.review.entity.dto.response.ReviewProductResponse;
 import project.trendpick_pro.domain.tags.tag.entity.Tag;
 
 import java.io.Serializable;
@@ -31,11 +34,14 @@ public class ProductResponse implements Serializable {
     private List<String> tags = new ArrayList<>();
     private int discountRate;
     private int discountedPrice;
+    private Page<ReviewProductResponse> reviewResponse;
+    private Page<AskResponse> askResponse;
 
     @Builder
     @QueryProjection
     public ProductResponse(Long id, String name, String mainCategory, String subCategory, String brand, String description,
-                           String mainFile, List<String> subFiles, List<String> sizes, List<String> colors, int price, List<String> tags, double discountRate, int discountedPrice) {
+                           String mainFile, List<String> subFiles, List<String> sizes, List<String> colors, int price, List<String> tags,
+                           double discountRate, int discountedPrice, Page<ReviewProductResponse> reviewResponse, Page<AskResponse> askResponse) {
         this.id = id;
         this.name = name;
         this.mainCategory = mainCategory;
@@ -50,9 +56,11 @@ public class ProductResponse implements Serializable {
         this.tags = tags;
         this.discountRate = (int) discountRate;
         this.discountedPrice = discountedPrice;
+        this.reviewResponse = reviewResponse;
+        this.askResponse = askResponse;
     }
 
-    public static ProductResponse of (Product product) {
+    public static ProductResponse of (Product product, Page<ReviewProductResponse> reviewResponse, Page<AskResponse> askResponse) {
         if (product.getDiscountedPrice() == 0 && product.getDiscountRate() == 0) {
             return ProductResponse.builder()
                     .id(product.getId())
@@ -67,6 +75,8 @@ public class ProductResponse implements Serializable {
                     .colors(product.getProductOption().getColors())
                     .price(product.getProductOption().getPrice())
                     .tags(product.getTags().stream().map(Tag::getName).toList())
+                    .reviewResponse(reviewResponse)
+                    .askResponse(askResponse)
                     .build();
         } else {
             return ProductResponse.builder()
@@ -84,6 +94,8 @@ public class ProductResponse implements Serializable {
                     .tags(product.getTags().stream().map(Tag::getName).toList())
                     .discountedPrice(product.getDiscountedPrice())
                     .discountRate(product.getDiscountRate())
+                    .reviewResponse(reviewResponse)
+                    .askResponse(askResponse)
                     .build();
         }
     }

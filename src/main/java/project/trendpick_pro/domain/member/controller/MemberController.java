@@ -6,16 +6,15 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import project.trendpick_pro.domain.member.controller.annotation.MemberEmail;
 import project.trendpick_pro.domain.member.entity.dto.MemberInfoResponse;
 import project.trendpick_pro.domain.member.service.MemberService;
 import project.trendpick_pro.global.basedata.tagname.service.TagNameService;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/member")
+@RequestMapping("/api/members")
 public class MemberController {
 
     private final MemberService memberService;
@@ -61,7 +60,7 @@ public class MemberController {
     }
 
     @PreAuthorize("hasAuthority({'MEMBER'})")
-    @PostMapping("/edit/address")
+    @PostMapping("/modify/address")
     public ResponseEntity<MemberInfoResponse> modifyAddress(@NotNull @RequestBody String address,
                                                             @MemberEmail String email) {
         return ResponseEntity.ok(memberService.modifyAddress(address, email));

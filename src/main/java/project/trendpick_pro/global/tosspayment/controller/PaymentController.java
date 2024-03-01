@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import project.trendpick_pro.domain.notification.service.NotificationService;
 import project.trendpick_pro.domain.orders.entity.Order;
-import project.trendpick_pro.domain.orders.service.OrderService;
 import project.trendpick_pro.global.util.rq.Rq;
 import project.trendpick_pro.global.util.rsData.RsData;
 import project.trendpick_pro.global.tosspayment.dto.PaymentResultResponse;
@@ -23,8 +22,6 @@ public class PaymentController {
     private final PaymentService paymentService;
     private final OrderService orderService;
     private final NotificationService notificationService;
-
-    private final Rq rq;
 
     @Transactional
     @GetMapping(value = "/{id}/success")

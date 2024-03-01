@@ -8,18 +8,18 @@
     <h1>고객센터</h1>
     <div class="mt-4 mb-4">
         <div class="p-4 bg-white border rounded">
-            <form th:object="${askForm}" method="post">
-                <input type="hidden" th:field="*{productId}" th:value="${askForm.productId}" class="form-control">
+            <form th:object="${askRequest}" method="post">
+                <input type="hidden" th:field="*{productId}" th:value="${askRequest.productId}" class="form-control">
                 <div class="mb-3">
                     <label for="title" class="form-label">제목</label>
                     <div class="border rounded">
-                        <textarea th:field="*{title}" th:value="${askForm.title}" class="form-control form-control-lg" rows="1" style="width: 100%; resize: vertical;"></textarea>
+                        <textarea th:field="*{title}" th:value="${askRequest.title}" class="form-control form-control-lg" rows="1" style="width: 100%; resize: vertical;"></textarea>
                     </div>
                 </div>
                 <div class="mb-3">
                     <label for="content" class="form-label">내용</label>
                     <div class="border rounded">
-                        <textarea th:field="*{content}" th:value="${askForm.content}" class="form-control form-control-lg" rows="10" style="width: 100%; resize: vertical;"></textarea>
+                        <textarea th:field="*{content}" th:value="${askRequest.content}" class="form-control form-control-lg" rows="10" style="width: 100%; resize: vertical;"></textarea>
                     </div>
                 </div>
                 <hr>

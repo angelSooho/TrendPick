@@ -7,61 +7,59 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.trendpick_pro.domain.ask.entity.Ask;
-import project.trendpick_pro.domain.ask.entity.dto.form.AskForm;
+import project.trendpick_pro.domain.ask.entity.dto.form.AskRequest;
 import project.trendpick_pro.domain.ask.entity.dto.response.AskResponse;
 import project.trendpick_pro.domain.ask.exception.AskNotFoundException;
 import project.trendpick_pro.domain.ask.exception.AskNotMatchException;
 import project.trendpick_pro.domain.ask.repository.AskRepository;
 import project.trendpick_pro.domain.member.entity.Member;
+import project.trendpick_pro.domain.member.service.MemberService;
 import project.trendpick_pro.domain.product.entity.product.Product;
-import project.trendpick_pro.domain.product.service.ProductService;
-import project.trendpick_pro.global.util.rsData.RsData;
 
 import java.util.Objects;
 
-@Transactional(readOnly = true)
-@RequiredArgsConstructor
 @Service
-public class AskService implements AskService {
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class AskService {
 
     private final AskRepository askRepository;
     private final ProductService productService;
 
+    private final MemberService memberService;
+
     @Transactional
-    @Override
-    public RsData<Long> register(Member member, AskForm askForm) {
-        Product product = productService.findById(askForm.getProductId());
-        Ask savedAsk = askRepository.save(Ask.of(askForm.getTitle(), askForm.getContent()));
+    public Long saveAsk(String email, AskRequest askRequest) {
+        Member member = memberService.findByEmail(email);
+        Product product = productService.findById(askRequest.getProductId());
+        Ask savedAsk = askRepository.save(Ask.of(askRequest.getTitle(), askRequest.getContent()));
         savedAsk.connectProduct(product);
         savedAsk.connectMember(member);
-        return RsData.of("S-1", product.getTitle()+"에 대한 문의가 등록되었습니다.", savedAsk.getId());
+        return savedAsk.getId();
     }
 
     @Transactional
-    @Override
-    public RsData<AskResponse> modify(Member member, Long askId, AskForm askForm) {
+    public AskResponse modify(String email, Long askId, AskRequest askRequest) {
+        Member member = memberService.findByEmail(email);
         Ask ask = getAskWithAuthValidation(member, askId);
-        ask.update(askForm);
-        return RsData.of("S-1", "상품 문의글 수정이 정상적으로 처리되었습니다.", AskResponse.of(ask));
+        ask.update(askRequest);
+        return AskResponse.of(ask);
     }
 
     @Transactional
-    @Override
-    public RsData<Long> delete(Member member, Long askId) {
+    public void delete(String email, Long askId) {
+        Member member = memberService.findByEmail(email);
         Ask ask = getAskWithAuthValidation(member, askId);
         askRepository.delete(ask);
-        return RsData.of("S-1", "상품 문의글이 삭제되었습니다.", ask.getProduct().getId());
     }
 
-    @Override
-    public AskResponse find(Long askId) {
+    public AskResponse getAsk(Long askId) {
         return AskResponse.of(
             askRepository.findById(askId)
                 .orElseThrow(() -> new AskNotFoundException("해당 문의글은 존재하지 않습니다."))
         );
     }
 
-    @Override
     public Page<AskResponse> findAsksByProduct(Long productId, int offset) {
         Pageable pageable = PageRequest.of(offset, 5);
         return askRepository.findAllByProductId(productId, pageable);

@@ -6,8 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
-import project.trendpick_pro.domain.orders.service.OrderService;
-import project.trendpick_pro.domain.product.exception.ProductStockOutException;
 import project.trendpick_pro.global.redis.exception.RedisLockException;
 
 import java.util.concurrent.TimeUnit;

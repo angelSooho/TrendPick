@@ -4,98 +4,60 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import project.trendpick_pro.global.util.rq.Rq;
-import project.trendpick_pro.domain.member.entity.Member;
-import project.trendpick_pro.domain.review.entity.Review;
+import project.trendpick_pro.domain.member.controller.annotation.MemberEmail;
 import project.trendpick_pro.domain.review.entity.dto.request.ReviewSaveRequest;
 import project.trendpick_pro.domain.review.entity.dto.response.ReviewResponse;
 import project.trendpick_pro.domain.review.service.ReviewService;
-import project.trendpick_pro.global.util.rsData.RsData;
 
-import java.io.IOException;
 import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/trendpick/review")
+@RequestMapping("/api/reviews")
 public class ReviewController {
+
     private final ReviewService reviewService;
-    private final Rq rq;
 
-    @GetMapping("/register/{productId}")
-    public String registerReview(@PathVariable("productId") Long productId, Model model) {
-        model.addAttribute("productId", productId);
-        return "trendpick/review/register";
-    }
-
-    @PostMapping("/register/{productId}")
-    public String createReview(@Valid ReviewSaveRequest reviewCreateRequest,
-                               @RequestParam("mainFile") MultipartFile mainFile,
-                               @RequestParam("subFiles") List<MultipartFile> subFiles,
-                               @PathVariable("productId") Long productId, Model model) throws Exception {
-        RsData<ReviewResponse> reviewResponse = reviewService.create(rq.getLogin(), productId, reviewCreateRequest, mainFile, subFiles);
-        model.addAttribute("reviewResponse", reviewResponse);
-        return rq.redirectWithMsg("/trendpick/review/list", reviewResponse);
+    @PostMapping("/save/{productId}")
+    public ResponseEntity<ReviewResponse> createReview(@Valid ReviewSaveRequest reviewCreateRequest,
+                                       @MemberEmail String email,
+                                       @RequestParam("mainFile") MultipartFile mainFile,
+                                       @RequestParam("subFiles") List<MultipartFile> subFiles,
+                                       @PathVariable("productId") Long productId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(reviewService.save(email, productId, reviewCreateRequest, mainFile, subFiles));
     }
 
     @GetMapping("/{reviewId}")
-    public String showReview(@PathVariable Long reviewId, Model model){
-        if (rq.checkLogin() && !rq.checkAdmin()) {
-            Member checkMember = rq.getMember();
-            String writer = checkMember.getNickName();
-            model.addAttribute("currentUser", writer);
-        }
-        model.addAttribute("reviewResponse", reviewService.getReview(reviewId));
-        return "trendpick/review/detail";
+    public ResponseEntity<ReviewResponse> showReview(@PathVariable Long reviewId){
+        return ResponseEntity.ok().body(reviewService.getReview(reviewId));
     }
 
     @DeleteMapping("/delete/{reviewId}")
-    public String deleteReview(@PathVariable Long reviewId) {
+    public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId) {
         reviewService.delete(reviewId);
-        return rq.redirectWithMsg("/trendpick/review/list", "삭제가 완료되었습니다.");
-    }
-
-    @GetMapping("/edit/{reviewId}")
-    public String showUpdateReview(@PathVariable Long reviewId, Model model){
-        Review review = reviewService.findById(reviewId);
-        model.addAttribute("originReview", review);
-        return "trendpick/review/modify";
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/edit/{reviewId}")
-    public String updateReview(@PathVariable Long reviewId, ReviewSaveRequest reviewSaveRequest, @RequestParam("mainFile") MultipartFile mainFile,
-                               @RequestParam("subFiles") List<MultipartFile> subFiles, Model model) throws IOException {
-        RsData<ReviewResponse> reviewResponse = reviewService.modify(reviewId, reviewSaveRequest, mainFile, subFiles);
-
-        model.addAttribute("reviewResponse", reviewResponse);
-        return rq.redirectWithMsg("/trendpick/review/" + reviewId, reviewResponse);
+    public ResponseEntity<ReviewResponse> updateReview(@PathVariable Long reviewId, ReviewSaveRequest reviewSaveRequest, @RequestParam("mainFile") MultipartFile mainFile,
+                               @RequestParam("subFiles") List<MultipartFile> subFiles) {
+        return ResponseEntity.ok().body(reviewService.modify(reviewId, reviewSaveRequest, mainFile, subFiles));
     }
 
 
-    @GetMapping("/list")
-    public String showAllReview(Pageable pageable, Model model){
-        Page<ReviewResponse> reviewResponses = reviewService.showAll(pageable);
-        model.addAttribute("reviewResponses", reviewResponses);
-
-        if (rq.checkLogin() && !rq.checkAdmin()) {
-            Member checkMember = rq.getMember();
-            String currentUser = checkMember.getNickName();
-            model.addAttribute("currentUser", currentUser);
-        }
-        return "trendpick/review/list";
+    @GetMapping
+    public ResponseEntity<Page<ReviewResponse>> showAllReview(Pageable pageable, Model model){
+        return ResponseEntity.ok().body(reviewService.getReviews(pageable));
     }
 
     @GetMapping("/user")
-    public String showOwnReview(Pageable pageable, Model model){
-        Member checkMember = rq.getLogin();
-        String writer = checkMember.getNickName();
-        Page<ReviewResponse> reviewResponses = reviewService.showOwnReview(writer, pageable);
-        model.addAttribute("reviewResponses", reviewResponses);
-        model.addAttribute("currentUser", writer);
-        return "trendpick/review/list";
+    public ResponseEntity<Page<ReviewResponse>> getOwnReviews(@MemberEmail String email, Pageable pageable){
+        return ResponseEntity.ok().body(reviewService.getOwnReviews(email, pageable));
     }
 }

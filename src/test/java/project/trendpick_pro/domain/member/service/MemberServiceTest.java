@@ -12,7 +12,7 @@
 //import project.trendpick_pro.domain.member.entity.form.JoinForm;
 //import project.trendpick_pro.domain.member.repository.MemberRepository;
 //import project.trendpick_pro.domain.recommend.repository.RecommendRepository;
-//import project.trendpick_pro.domain.recommend.service.impl.RecommendServiceImpl;
+//import project.trendpick_pro.domain.recommend.service.RecommendServiceImpl;
 //import project.trendpick_pro.domain.tags.favoritetag.repository.FavoriteTagRepository;
 //import project.trendpick_pro.domain.tags.tag.entity.dto.request.TagRequest;
 //import project.trendpick_pro.global.util.rsData.RsData;

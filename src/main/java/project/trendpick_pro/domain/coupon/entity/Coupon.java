@@ -1,14 +1,12 @@
 package project.trendpick_pro.domain.coupon.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import project.trendpick_pro.domain.common.base.BaseTimeEntity;
-import project.trendpick_pro.domain.coupon.entity.dto.request.StoreCouponSaveRequest;
+import project.trendpick_pro.domain.coupon.entity.dto.request.CouponSaveRequest;
 import project.trendpick_pro.domain.coupon.entity.expirationPeriod.ExpirationPeriod;
 import project.trendpick_pro.domain.store.entity.Store;
 
@@ -52,7 +50,7 @@ public class Coupon extends BaseTimeEntity {
         this.issueCount = 0;
     }
 
-    public static Coupon of(StoreCouponSaveRequest request, String store) {
+    public static Coupon of(CouponSaveRequest request, String store) {
         return Coupon
                 .builder()
                 .name(createCouponName(store, request.getName()))

@@ -1,52 +1,39 @@
 package project.trendpick_pro.domain.withdraw.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import project.trendpick_pro.domain.member.entity.Member;
+import org.springframework.web.bind.annotation.*;
+import project.trendpick_pro.domain.member.controller.annotation.MemberEmail;
 import project.trendpick_pro.domain.withdraw.entity.WithdrawApply;
 import project.trendpick_pro.domain.withdraw.service.WithdrawService;
-import project.trendpick_pro.global.util.rq.Rq;
 
 import java.util.List;
 
-@Controller
-@RequestMapping("/trendpick/admin")
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/admin")
 public class AdmWithdrawController {
 
     private final WithdrawService withdrawService;
-    private final Rq rq;
 
     @PreAuthorize("hasAuthority({'ADMIN', 'BRAND_ADMIN'})")
     @GetMapping("/withDrawList")
-    public String showApplyList(Model model) {
-        Member member= rq.getAdmin();
-        List<WithdrawApply> withdrawApplies;
-
-        if(member.getRole().getValue().equals("ADMIN")) {
-            withdrawApplies = withdrawService.findAll();
-        }else{
-            withdrawApplies=withdrawService.findAllWithdrawByStoreName(member.getBrand());
-        }
-        model.addAttribute("withdrawApplies", withdrawApplies);
-        return "trendpick/admin/withDrawList";
+    public ResponseEntity<List<WithdrawApply>> showApplyList(@MemberEmail String email) {
+        return ResponseEntity.ok().body(withdrawService.getWithdraws(email));
     }
 
     @PreAuthorize("hasAuthority({'ADMIN'})")
     @PostMapping("/{withdrawApplyId}")
-    public String applyDone(@PathVariable Long withdrawApplyId) {
-        return rq.redirectWithMsg("/trendpick/admin/withDrawList", withdrawService.withdraw(withdrawApplyId));
+    public ResponseEntity<Void> applyDone(@PathVariable Long withdrawApplyId) {
+        withdrawService.withdraw(withdrawApplyId);
+        return ResponseEntity.noContent().build();
     }
 
     @PreAuthorize("hasAuthority({'ADMIN'})")
     @PostMapping("/{withdrawApplyId}/cancel")
-    public String cancel(@PathVariable Long withdrawApplyId) {
-        return rq.redirectWithMsg("/trendpick/admin/withDrawList", withdrawService.cancelApply(withdrawApplyId));
+    public ResponseEntity<Void> cancel(@PathVariable Long withdrawApplyId) {
+        withdrawService.cancelApply(withdrawApplyId);
+        return ResponseEntity.noContent().build();
     }
 }
