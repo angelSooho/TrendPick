@@ -92,7 +92,14 @@ public class BaseData implements
         long startTime = System.currentTimeMillis();
         task.run();
         long endTime = System.currentTimeMillis();
-        log.info("{}: {}sec", taskName, (endTime - startTime) / 1000.0);
+        double resultTime = (endTime - startTime) / 1000.0;
+        if (resultTime > 60) {
+            resultTime /= 60;
+            log.info("{}: {}min", taskName, resultTime);
+        } else {
+            resultTime = (endTime - startTime) / 1000.0;
+            log.info("{}: {}sec", taskName, resultTime);
+        }
     }
 
     public void saveMembersBulk(int count) {
