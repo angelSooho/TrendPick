@@ -102,7 +102,7 @@ public class ProductService {
         List<CommonFile> subFiles = fileTranslator.saveFiles(requestSubFiles);
         subFiles.forEach(mainFile::connectFile);
 
-        product.getProductOption().getFile().deleteFile(amazonS3, amazonProperties.getBucket());
+        product.getProductOption().getFile().deleteFile(amazonS3, amazonProperties.getS3().getBucket());
         product.getProductOption().updateFile(mainFile);
 
         Set<Tag> tags = new LinkedHashSet<>();
@@ -117,7 +117,7 @@ public class ProductService {
     @Transactional
     public void delete(Long productId) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND, "존재하지 않는 상품입니다."));
-        product.getProductOption().getFile().deleteFile(amazonS3, amazonProperties.getBucket());
+        product.getProductOption().getFile().deleteFile(amazonS3, amazonProperties.getS3().getBucket());
         productRepository.delete(product);
     }
 

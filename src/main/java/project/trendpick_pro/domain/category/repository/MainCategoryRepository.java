@@ -5,9 +5,10 @@ import org.springframework.data.jpa.repository.Query;
 import project.trendpick_pro.domain.category.entity.MainCategory;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MainCategoryRepository extends JpaRepository<MainCategory, Long> {
-    MainCategory findByName(String name);
+    Optional<MainCategory> findByName(String name);
 
     @Query("select c.name from MainCategory c")
     List<String> findAllByName();

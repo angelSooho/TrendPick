@@ -61,7 +61,7 @@ public class ReviewService {
     public ReviewResponse modify(Long reviewId, ReviewSaveRequest reviewSaveRequest, MultipartFile requestMainFile, List<MultipartFile> requestSubFiles) {
         Review review = reviewRepository.findById(reviewId).orElseThrow();
 
-        review.getFile().deleteFile(amazonS3, amazonProperties.getBucket());
+        review.getFile().deleteFile(amazonS3, amazonProperties.getS3().getBucket());
         review.disconnectFile();
 
         CommonFile mainFile = fileTranslator.saveFile(requestMainFile);
@@ -78,7 +78,7 @@ public class ReviewService {
     @Transactional
     public void delete(Long reviewId) {
         Review review = reviewRepository.findById(reviewId).orElseThrow();
-        review.getFile().deleteFile(amazonS3, amazonProperties.getBucket());
+        review.getFile().deleteFile(amazonS3, amazonProperties.getS3().getBucket());
         reviewRepository.delete(review);
     }
 

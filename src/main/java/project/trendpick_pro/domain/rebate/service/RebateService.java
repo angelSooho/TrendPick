@@ -77,25 +77,25 @@ public class RebateService {
         return rebateOrderItemRepository.findAllByCreatedDateBetweenAndSellerNameOrderByIdAsc(fromDate, toDate,brandName);
     }
 
-    @Transactional
-    public void rebate(long orderItemId) {
-        RebateOrderItem rebateOrderItem = rebateOrderItemRepository.findByOrderItemId(orderItemId).get();
-
-        if (!rebateOrderItem.isRebateDone()) {
-            throw new BaseException(ErrorCode.BAD_REQUEST, "이미 정산된 주문품목입니다.");
-        }
-
-        int calculateRebatePrice = rebateOrderItem.calculateRebatePrice();
-
-        CashLog cashLog = memberService.addCash(
-                rebateOrderItem.getSellerName(),
-                calculateRebatePrice,
-                rebateOrderItem.getSeller(),
-                CashLog.EvenType.브랜드정산__예치금
-        ).getCashLog();
-
-        rebateOrderItem.setRebateDone(cashLog);
-    }
+//    @Transactional
+//    public void rebate(long orderItemId) {
+//        RebateOrderItem rebateOrderItem = rebateOrderItemRepository.findByOrderItemId(orderItemId).get();
+//
+//        if (!rebateOrderItem.isRebateDone()) {
+//            throw new BaseException(ErrorCode.BAD_REQUEST, "이미 정산된 주문품목입니다.");
+//        }
+//
+//        int calculateRebatePrice = rebateOrderItem.calculateRebatePrice();
+//
+//        CashLog cashLog = memberService.addCash(
+//                rebateOrderItem.getSellerName(),
+//                calculateRebatePrice,
+//                rebateOrderItem.getSeller(),
+//                CashLog.EvenType.브랜드정산__예치금
+//        ).getCashLog();
+//
+//        rebateOrderItem.setRebateDone(cashLog);
+//    }
 
     private static generatedDateTime getGeneratedDateTime(String yearMonth) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");

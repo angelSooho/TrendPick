@@ -8,9 +8,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.trendpick_pro.domain.brand.entity.Brand;
-import project.trendpick_pro.domain.cash.entity.CashLog;
-import project.trendpick_pro.domain.cash.entity.dto.CashResponse;
 import project.trendpick_pro.domain.common.file.JsonConvertor;
 import project.trendpick_pro.domain.common.file.NickName;
 import project.trendpick_pro.domain.member.entity.Member;
@@ -61,9 +58,9 @@ public class MemberService  {
                 .phoneNumber(phoneNumber)
                 .provider(SocialProvider.isType(provider))
                 .role(MemberRole.isType(role))
-                .socialAuthToken(response)
                 .brand(brand)
                 .build();
+        member.connectSocialAuthToken(response);
         settingMember(member, brand, null);
         return memberRepository.save(member);
     }
@@ -164,19 +161,6 @@ public class MemberService  {
         NickName.First first = nickName.first().get(ThreadLocalRandom.current().nextInt(nickName.first().size()));
         NickName.Last last = nickName.last().get(ThreadLocalRandom.current().nextInt(nickName.first().size()));
         return first.getName() + " " + last.getName();
-    }
-
-    @Transactional
-    public CashResponse addCash(String brand, long price, Brand relEntity, CashLog.EvenType eventType) {
-        Member member= memberRepository.findByBrand(brand).orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND, "해당 브랜드로 가입된 회원이 없습니다."));
-
-        long newRestCash = getRestCash(member) + price;
-        member.connectCash(newRestCash);
-        return new CashResponse(new CashLog());
-    }
-
-    public long getRestCash(Member member) {
-        return memberRepository.findById(member.getId()).get().getRestCash();
     }
 
     private void settingMember(Member member, String brand, List<String> tags) {

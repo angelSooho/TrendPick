@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.trendpick_pro.domain.category.entity.MainCategory;
 import project.trendpick_pro.domain.category.repository.MainCategoryRepository;
+import project.trendpick_pro.global.exception.BaseException;
+import project.trendpick_pro.global.exception.ErrorCode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,6 @@ public class MainCategoryService {
     }
 
     public MainCategory findByName(String username) {
-        return mainCategoryRepository.findByName(username);
+        return mainCategoryRepository.findByName(username).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND, "해당 카테고리가 존재하지 않습니다."));
     }
 }

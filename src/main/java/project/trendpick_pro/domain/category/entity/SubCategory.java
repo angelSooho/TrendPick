@@ -23,7 +23,7 @@ public class SubCategory {
     public SubCategory(String name, MainCategory mainCategory) {
         this.name = name;
         this.mainCategory = mainCategory;
-        this.mainCategory.getSubCategories().add(this);
+        mainCategory.getSubCategories().add(this);
     }
 
     public void modify(String name) {

@@ -30,6 +30,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(
                         auth -> auth
+                            .requestMatchers("h2-console").permitAll()
                             .requestMatchers("/api/members/login").hasRole("ANONYMOUS")
                             .requestMatchers("/api/**").authenticated()
                 )

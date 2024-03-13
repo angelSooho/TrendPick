@@ -39,7 +39,7 @@ public class FileTranslator {
             String originalFilename = multipartFile.getOriginalFilename();
             String translatedFileName = translateFileName(originalFilename);
 
-            PutObjectRequest putObjectRequest = new PutObjectRequest(amazonProperties.getBucket(), translatedFileName, multipartFile.getInputStream(), new ObjectMetadata())
+            PutObjectRequest putObjectRequest = new PutObjectRequest(amazonProperties.getS3().getBucket(), translatedFileName, multipartFile.getInputStream(), new ObjectMetadata())
                     .withCannedAcl(CannedAccessControlList.PublicRead);
             amazonS3.putObject(putObjectRequest);
 

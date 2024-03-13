@@ -13,16 +13,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class SocialAuthToken {
 
-    @Column(nullable = false)
     private String accessToken;
 
-    @Column(nullable = false)
     private String refreshToken;
 
-    @Column(nullable = false, columnDefinition = "DATETIME")
+    @Column(columnDefinition = "DATETIME")
     private LocalDateTime accessTokenExpiresAt;
 
-    @Column(nullable = false, columnDefinition = "DATETIME")
+    @Column(columnDefinition = "DATETIME")
     private LocalDateTime refreshTokenExpiresAt;
 
     public void updateToken(OAuthTokenResponse oAuthTokenResponse){

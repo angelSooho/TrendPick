@@ -2,12 +2,13 @@ package project.trendpick_pro.global.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.List;
 
-@Getter
+@Data
 @ConfigurationProperties
 public class DataProperties {
 
@@ -26,11 +27,11 @@ public class DataProperties {
 
     private Sizes sizes;
 
-    @AllArgsConstructor
-    private static class Sizes {
+    @Data
+    public static class Sizes {
         private List<String> tops;
         private List<String> bottoms;
-        private List<String> shoess;
+        private List<String> shoes;
     }
 
 }

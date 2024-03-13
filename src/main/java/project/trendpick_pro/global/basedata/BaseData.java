@@ -1,388 +1,394 @@
-//package project.trendpick_pro.global.basedata;
-//
-//import com.amazonaws.ClientConfiguration;
-//import com.amazonaws.auth.AWSStaticCredentialsProvider;
-//import com.amazonaws.auth.BasicAWSCredentials;
-//import com.amazonaws.regions.Regions;
-//import com.amazonaws.services.s3.AmazonS3;
-//import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-//import com.amazonaws.services.s3.model.ObjectListing;
-//import com.amazonaws.services.s3.model.S3ObjectSummary;
-//import jakarta.annotation.PostConstruct;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.boot.CommandLineRunner;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.context.annotation.Profile;
-//import org.springframework.jdbc.core.JdbcTemplate;
-//import org.springframework.transaction.annotation.Transactional;
-//import project.trendpick_pro.domain.brand.entity.Brand;
-//import project.trendpick_pro.domain.category.entity.MainCategory;
-//import project.trendpick_pro.domain.category.entity.SubCategory;
-//import project.trendpick_pro.domain.common.file.CommonFile;
-//import project.trendpick_pro.domain.coupon.entity.Coupon;
-//import project.trendpick_pro.domain.coupon.entity.expirationPeriod.ExpirationType;
-//import project.trendpick_pro.domain.coupon.repository.CouponRepository;
-//import project.trendpick_pro.domain.member.entity.Member;
-//import project.trendpick_pro.domain.product.entity.product.Product;
-//import project.trendpick_pro.domain.product.entity.product.ProductStatus;
-//import project.trendpick_pro.domain.product.entity.productOption.ProductOption;
-//import project.trendpick_pro.domain.product.entity.productOption.dto.ProductOptionSaveRequest;
-//import project.trendpick_pro.domain.product.repository.ProductRepository;
-//import project.trendpick_pro.domain.product.service.ProductService;
-//import project.trendpick_pro.domain.recommend.service.RecommendService;
-//import project.trendpick_pro.domain.review.entity.Review;
-//import project.trendpick_pro.domain.review.entity.dto.request.ReviewSaveRequest;
-//import project.trendpick_pro.domain.review.repository.ReviewRepository;
-//import project.trendpick_pro.domain.store.entity.Store;
-//import project.trendpick_pro.domain.store.repository.StoreRepository;
-//import project.trendpick_pro.domain.tags.tag.entity.Tag;
-//import project.trendpick_pro.global.basedata.tagname.entity.TagName;
-//import project.trendpick_pro.global.basedata.tagname.service.TagNameService;
-//import project.trendpick_pro.global.config.AmazonProperties;
-//import project.trendpick_pro.global.config.DataProperties;
-//import project.trendpick_pro.global.kafka.view.service.ViewService;
-//
-//import java.util.*;
-//
-//@Configuration
-//@Profile({"dev"})
-//@RequiredArgsConstructor
-//public class BaseData {
-//
-//    private final AmazonProperties amazonProperties;
-//    private final DataProperties dataProperties;
-//
-//    private final JdbcTemplate jdbcTemplate;
-//
-//    @PostConstruct
-//    public void init() {
-//        jdbcTemplate.batchUpdate()
-//
-//        return new CommandLineRunner() {
-//            @Override
-//            @Transactional
-//            public void run(String... args) {
-//
-//                tagNameService.saveAll(tags);
-//                memberService.joinAll(makeBrandMembers(brands));
-//                mainCategoryService.saveAll(mainCategories);
-//
-//                SaveAllSubCategories(mainCategoryService, subCategoryService);
-//
-//                Map<String, String> accessKeyMap = new HashMap<>();
-//                accessKeyMap.put("accessKey", accessKey);
-//                accessKeyMap.put("secretKey", secretKey);
-//                accessKeyMap.put("bucket", bucket);
-//
-//                int memberCount = 100;
-//                int productCount = 2000;
-//                int reviewCount = 100;
-//                int couponCount = 100;
-//                String brandName = "polo";
-//
-//                saveMembers(memberCount, tagNameService, memberService);
-//                saveUniqueMembers(memberService, brandName);
-//
-//                saveProducts(productCount, accessKeyMap, mainCategoryService, brandService, tagNameService, productRepository, brandName, sizeTops, sizeBottoms, sizeShoes, colors);
-//                updateRecommends(memberService, recommendService);
-//
-//                saveReviews(reviewCount, productCount, accessKeyMap, memberService, productService ,reviewRepository);
-//                saveStoreCoupon(couponCount, storeRepository, couponRepository, brandService);
-//
-//                if (viewService.findSize() == 0) {
-//                    viewService.registerView();
-//                }
-//
-//                log.info("BASE_DATA_SUCCESS");
-//            }
-//        };
-//    }
-//
-//    private void saveMembers(int count, TagNameService tagNameService, MemberService memberService) {
-//        List<JoinForm> members = new ArrayList<>();
-//        for(int i=1; i<=count; i++){
-//            List<String> memberTags = new ArrayList<>();
-//            for (int j = 1; j <= (Math.random() * 10)+1; j++) {
-//                TagName tagName = tagNameService.findById((long)(Math.random() * 30) + 1L);
-//                memberTags.add(tagName.getName());
-//            }
-//            JoinForm member = JoinForm.builder()
-//                    .email("trendpick"+i+"@naver.com")
-//                    .password("12345")
-//                    .username("sooho"+i)
-//                    .phoneNumber("010-1234-1234")
-//                    .state("MEMBER")
-//                    .tags(memberTags)
-//                    .build();
-//            members.add(member);
-//        }
-//        List<Member> memberList = memberService.joinAll(members).getData();
-//        for (Member member : memberList) {
-//            member.connectAddress("서울특별시 어디구 어디로 123");
-//        }
-//    }
-//
-//    private List<JoinForm> makeBrandMembers(List<String> brandNames) {
-//        List<JoinForm> brandList = new ArrayList<>();
-//        for (String brandName : brandNames) {
-//            JoinForm brandAdmin = JoinForm.builder()
-//                    .email(brandName + "@naver.com")
-//                    .password("12345")
-//                    .username(brandName)
-//                    .phoneNumber("010-1234-1234")
-//                    .state("BRAND_ADMIN")
-//                    .brand(brandName)
-//                    .build();
-//            brandList.add(brandAdmin);
-//        }
-//        return brandList;
-//    }
-//
-//    private void saveUniqueMembers(MemberService memberService, String brandName) {
-//        List<JoinForm> members = new ArrayList<>();
-//        JoinForm admin = JoinForm.builder()
-//                .email("admin@naver.com")
-//                .password("12345")
-//                .username("admin")
-//                .phoneNumber("010-1234-1234")
-//                .state("ADMIN")
-//                .build();
-//        members.add(admin);
-//
-//        JoinForm brandAdmin = JoinForm.builder()
-//                .email("brand@naver.com")
-//                .password("12345")
-//                .username("brand")
-//                .phoneNumber("010-1234-1234")
-//                .state("BRAND_ADMIN")
-//                .brand(brandName)
-//                .build();
-//        members.add(brandAdmin);
-//
-//        JoinForm member = JoinForm.builder()
-//                .email("trendpick@naver.com")
-//                .password("12345")
-//                .username("sooho")
-//                .phoneNumber("010-1234-1234")
-//                .state("MEMBER")
-//                .tags(tags)
-//                .build();
-//        members.add(member);
-//
-//        JoinForm member2 = JoinForm.builder()
-//                .email("hye_0000@naver.com")
-//                .password("12345")
-//                .username("hye0000")
-//                .phoneNumber("010-1234-1234")
-//                .state("MEMBER")
-//                .tags(List.of("오버핏청바지", "로맨틱룩"))
-//                .build();
-//        members.add(member2);
-//        RsData<List<Member>> data = memberService.joinAll(members);
-//        for (Member saveMember : data.getData()) {
-//            saveMember.connectAddress("서울특별시 어디구 어디로 123");
-//        }
-//    }
-//
-//    public void updateRecommends(MemberService memberService, RecommendService recommendService) {
-//        Optional<Member> findMember = memberService.findByEmail("trendpick@naver.com");
-//        findMember.ifPresent(recommendService::rankRecommendFirst);
-//        findMember = memberService.findByEmail("hye_0000@naver.com");
-//        findMember.ifPresent(recommendService::rankRecommendFirst);
-//    }
-//
-//    private static void saveProducts(int count, Map<String, String> keys, MainCategoryService mainCategoryService, BrandService brandService, TagNameService tagNameService, ProductRepository productRepository, String brandName,
-//                                     List<String> sizeTops, List<String> sizeBottoms, List<String> sizeShoes, List<String> colors) {
-//        long result;
-//        List<Product> products = new ArrayList<>();
-//        for (int n = 1; n <= count; n++) {
-//            CommonFile commonFile = makeFiles(keys);
-//            result = (long) (Math.random() * 7);
-//            MainCategory mainCategory = mainCategoryService.findByBaseId(result + 1L);
-//
-//            result = (long) (Math.random() * brandService.count());
-//            Brand brand = brandService.findById(result + 1L);
-//            Brand UniqueBrand = brandService.findByName(brandName);
-//
-//            if (Math.random() < 0.1) {
-//                brand = UniqueBrand;
-//            }
-//
-//            if (!Objects.equals(mainCategory.getName(), "추천")) {
-//
-//                result = (int) (Math.random() * 6);
-//                List<SubCategory> subCategories = mainCategory.getSubCategories();
-//                SubCategory subCategory = subCategories.get((int) result);
-//
-//                int stockRandom = (int) (Math.random() * 200)+ 100;
-//                int priceRandom = (int) (Math.random() * (250000 - 20000 + 1)) + 10000;
-//
-//                List<String> inputColors = new ArrayList<>(colors); // colors 리스트 복사
-//
-//                Collections.shuffle(inputColors); // 색상 리스트 섞기
-//
-//                int numColors = (int) (Math.random() * 3) + 3; // 필요한 개수 설정
-//                if (numColors > inputColors.size()) {
-//                    numColors = inputColors.size(); // 필요한 개수가 실제 색상 리스트 크기보다 크다면 최대값으로 설정
-//                }
-//
-//                List<String> selectedColors = inputColors.subList(0, numColors);
-//
-//                List<String> inputSizes = new ArrayList<>();
-//                switch (mainCategory.getName()) {
-//                    case "상의", "아우터" -> {
-//                        int startIndex = (int) (Math.random() * 2);
-//                        int endIndex = startIndex + (int) (Math.random() * 4);
-//                        for (int i = startIndex; i < endIndex + 3; i++) {
-//                            inputSizes.add(sizeTops.get(i));
-//                        }
-//                    }
-//                    case "하의" -> {
-//                        int startIndex = (int) (Math.random() * 2);
-//                        int endIndex = startIndex + (int) (Math.random() * 8);
-//                        for (int i = startIndex; i < endIndex + 3; i++) {
-//                            inputSizes.add(sizeBottoms.get(i));
-//                        }
-//                    }
-//                    case "신발" -> {
-//                        int startIndex = (int) (Math.random() * 2);
-//                        int endIndex = startIndex + (int) (Math.random() * 8);
-//                        for (int i = startIndex; i < endIndex + 3; i++) {
-//                            inputSizes.add(sizeShoes.get(i));
-//                        }
-//                    }
-//                    default -> inputSizes.add("FREE");
-//                }
-//
-//                ProductOptionSaveRequest request = ProductOptionSaveRequest.of(inputSizes, selectedColors, stockRandom, priceRandom, ProductStatus.SALE.getText());
-//                ProductOption productOption = ProductOption.of(request);
-//                productOption.settingConnection(brand, mainCategory, subCategory, commonFile, ProductStatus.SALE);
-//
-//                Product product = Product
-//                        .builder()
-//                        .productCode("P" + UUID.randomUUID())
-//                        .title(brand.getName() + " " + mainCategory.getName() + " " + subCategory.getName() + " 멋사입니다. ")
-//                        .description(brand.getName() + " " + mainCategory.getName() + " " + subCategory.getName() + " 멋사입니다. ")
-//                        .build();
-//                product.connectProductOption(productOption);
-//                Set<Tag> tags = new LinkedHashSet<>();
-//                for (int i = 1; i <= (Math.random() * 13)+5; i++) {
-//                    while (true) {
-//                        result = (long) (Math.random() * 30);
-//                        TagName tagName = tagNameService.findById(result + 1L);
-//                        Tag tag = new Tag(tagName.getName());
-//                        if (tags.add(tag)) {
-//                            break;
-//                        }
-//                    }
-//                }
-//                product.updateTags(tags);
-//                products.add(product);
-//            }
-//        }
-//        productRepository.saveAll(products);
-//    }
-//
-//    private void saveReviews(int count, int productCount, Map<String, String> keys, MemberService memberService, ProductService productService, ReviewRepository reviewRepository) {
-//        List<Review> reviews = new ArrayList<>();
-//        for(int i=1; i<=count; i++){
-//            CommonFile commonFile = makeFiles(keys);
-//            Product product = productService.findById((long) (Math.random() * (productCount/2))+1L);
-//            ReviewSaveRequest rr = ReviewSaveRequest.builder()
-//                    .title("리뷰입니다.")
-//                    .content("내용입니다")
-//                    .rating(5)
-//                    .build();
-//            reviews.add(Review.of(rr, memberService.findByEmail("trendpick@naver.com").get(), product, commonFile));
-//        }
-//        reviewRepository.saveAll(reviews);
-//    }
-//    private void saveStoreCoupon(int couponCount, StoreRepository storeRepository, CouponRepository couponRepository, BrandService brandService){
-//        List<Coupon> coupons = new ArrayList<>();
-//        for(int i=1; i<couponCount; i++){
-//            int limitCount = (int) (Math.random() * 200)+ 100;
-//            int limitIssueDate = (int) (Math.random() * 360) + 1;
-//            int minimumPurchaseAmount = (int) (Math.random() * 50000) + 1000;
-//            int discountPercent = (int) (Math.random() * 90) + 5;
-//            int issueAfterDate = (int) (Math.random() * 20) + 7;
-//            long result = (long) (Math.random() * 7) + 1L;
-//            Store store = storeRepository.findById(result + 1L).get();
-//            StoreCouponSaveRequest request = StoreCouponSaveRequest.builder()
-//                    .name("쿠폰" + i)
-//                    .limitCount(limitCount)
-//                    .limitIssueDate(limitIssueDate)
-//                    .minimumPurchaseAmount(minimumPurchaseAmount)
-//                    .discountPercent(discountPercent)
-//                    .expirationType("ISSUE_AFTER_DATE")
-//                    .issueAfterDate(issueAfterDate)
-//                    .build();
-//            Coupon coupon = Coupon.of(request, store.getBrand());
-//            updateExpirationType(request, coupon);
-//            coupon.connectStore(store);
-//            coupons.add(coupon);
-//        }
-//        couponRepository.saveAll(coupons);
-//    }
-//
-//    private static void updateExpirationType(StoreCouponSaveRequest request, Coupon coupon) {
-//        if(request.getExpirationType().equals(ExpirationType.PERIOD.getValue()))
-//            coupon.assignPeriodExpiration(request.getStartDate(), request.getEndDate());
-//        else if(request.getExpirationType().equals(ExpirationType.ISSUE_AFTER_DATE.getValue()))
-//            coupon.assignPostIssueExpiration(request.getIssueAfterDate());
-//    }
-//
-//    private void SaveAllSubCategories(MainCategoryService mainCategoryService, SubCategoryService subCategoryService) {
-//        subCategoryService.saveAll(tops, mainCategoryService.findByName("상의"));
-//        subCategoryService.saveAll(outers, mainCategoryService.findByName("아우터"));
-//        subCategoryService.saveAll(bottoms, mainCategoryService.findByName("하의"));
-//        subCategoryService.saveAll(shoes, mainCategoryService.findByName("신발"));
-//        subCategoryService.saveAll(bags, mainCategoryService.findByName("가방"));
-//        subCategoryService.saveAll(accessories, mainCategoryService.findByName("악세서리"));
-//    }
-//
-//    public static CommonFile makeFiles(Map<String, String> keys) {
-//        AmazonS3 s3Client = createNcpS3Client(keys.get("accessKey"), keys.get("secretKey"));
-//
-//        List<String> filenames = listS3ObjectKeys(s3Client, keys.get("bucket"));
-//
-//        CommonFile mainFile = CommonFile.builder()
-//                .fileName(selectRandomFilePath(filenames))
-//                .build();
-//        for (int i = 0; i < (int) (Math.random() * 6) + 2; i++) {
-//            mainFile.connectFile(CommonFile.builder()
-//                    .fileName(selectRandomFilePath(filenames))
-//                    .build());
-//        }
-//        return mainFile;
-//    }
-//
-//    private static AmazonS3 createNcpS3Client(String accessKey, String secretKey) {
-//        BasicAWSCredentials awsCreds = new BasicAWSCredentials(accessKey, secretKey);
-//
-//        ClientConfiguration clientConfig = new ClientConfiguration();
-//
-//        return AmazonS3ClientBuilder.standard()
-//                .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
-//                .withClientConfiguration(clientConfig)
-//                .withEndpointConfiguration(new AmazonS3ClientBuilder.EndpointConfiguration("https://kr.object.ncloudstorage.com", Regions.AP_NORTHEAST_2.getName()))
-//                .build();
-//    }
-//
-//    private static List<String> listS3ObjectKeys(AmazonS3 s3Client, String bucketName) {
-//        ObjectListing objectListing = s3Client.listObjects(bucketName);
-//
-//        return objectListing.getObjectSummaries().stream()
-//                .map(S3ObjectSummary::getKey)
-//                .toList();
-//    }
-//
-//    private static String selectRandomFilePath(List<String> filePaths) {
-//        Random random = new Random();
-//        String path = filePaths.get(random.nextInt(filePaths.size()));
-//        while (path.equals("trendpick_logo.png") || path.endsWith("/")) {
-//            path = filePaths.get(random.nextInt(filePaths.size()));
-//        }
-//        return path;
-//    }
-//}
+package project.trendpick_pro.global.basedata;
+
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomUtils;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Profile;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+import project.trendpick_pro.domain.brand.entity.Brand;
+import project.trendpick_pro.domain.category.entity.MainCategory;
+import project.trendpick_pro.domain.category.entity.SubCategory;
+import project.trendpick_pro.domain.category.service.MainCategoryService;
+import project.trendpick_pro.domain.category.service.SubCategoryService;
+import project.trendpick_pro.domain.common.file.CommonFile;
+import project.trendpick_pro.domain.member.entity.Member;
+import project.trendpick_pro.domain.member.entity.MemberRole;
+import project.trendpick_pro.domain.member.entity.SocialProvider;
+import project.trendpick_pro.domain.product.entity.product.Product;
+import project.trendpick_pro.domain.product.entity.product.ProductStatus;
+import project.trendpick_pro.domain.product.entity.productOption.ProductOption;
+import project.trendpick_pro.domain.tags.tag.entity.Tag;
+import project.trendpick_pro.global.basedata.tagname.entity.TagName;
+import project.trendpick_pro.global.config.AmazonProperties;
+import project.trendpick_pro.global.config.DataProperties;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+@Slf4j
+@Component
+@Profile({"local"})
+@RequiredArgsConstructor
+public class BaseData implements
+        ApplicationListener<ContextRefreshedEvent> {
+
+    private final AmazonProperties amazonProperties;
+    private final DataProperties dataProperties;
+    private final AmazonS3Client amazonS3Client;
+
+    private final JdbcTemplate jdbcTemplate;
+
+    private final MainCategoryService mainCategoryService;
+    private final SubCategoryService subCategoryService;
+
+    @Override public void onApplicationEvent(ContextRefreshedEvent event) {
+        long startTime = System.currentTimeMillis();
+        Map<String, List<String>> categories = new HashMap<>();
+        categories.put("상의", dataProperties.getTop());
+        categories.put("하의", dataProperties.getBottom());
+        categories.put("신발", dataProperties.getShoes());
+        categories.put("아우터", dataProperties.getOuter());
+        categories.put("가방", dataProperties.getBag());
+        categories.put("액세서리", dataProperties.getAccessory());
+
+        int memberCount = 100;
+        int fileCount = 100;
+        int productCount = 10_000_000;
+
+        executionTime("member insert", () -> saveMembersBulk(memberCount));
+        executionTime("brandMember insert", () -> makeBrandMembersBulk(dataProperties.getBrand()));
+        executionTime("mainCategory insert", () -> saveMainCategoriesBulk(dataProperties.getMainCategory()));
+        executionTime("subCategory insert", () -> saveSubCategoriesBulk(categories));
+        executionTime("file insert", () -> saveFilesBulk(fileCount));
+            executionTime("productOption insert", () -> {
+                try {
+                    saveProductOptionsBulk(productCount, fileCount);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
+        executionTime("product insert", () -> {
+            try {
+                saveProductsBulk(productCount);
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+    }
+
+    public void executionTime(String taskName, Runnable task) {
+        long startTime = System.currentTimeMillis();
+        task.run();
+        long endTime = System.currentTimeMillis();
+        log.info("{}: {}sec", taskName, (endTime - startTime) / 1000.0);
+    }
+
+    public void saveMembersBulk(int count) {
+        List<Member> memberList = new ArrayList<>();
+        for(int i=1; i<=count; i++){
+            Member member = Member.builder()
+                    .email("member" + i + "@naver.com")
+                    .nickName("member" + i)
+                    .phoneNumber("010-1234-1234")
+                    .provider(SocialProvider.NAVER)
+                    .role(MemberRole.MEMBER)
+                    .build();
+            memberList.add(member);
+            member.connectAddress("서울특별시 어디구 어디로 123");
+        }
+        Member admin = Member.builder()
+                .email("admin@test.com")
+                .nickName("admin")
+                .phoneNumber("010-1234-1234")
+                .provider(SocialProvider.NAVER)
+                .role(MemberRole.ADMIN)
+                .build();
+        admin.connectAddress("서울특별시 어디구 어디로 123");
+        memberList.add(admin);
+
+        String sql = "INSERT INTO member (email, nick_name, phone_number, provider, role, address) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                Member member = memberList.get(i);
+                ps.setString(1, member.getEmail());
+                ps.setString(2, member.getNickName());
+                ps.setString(3, member.getPhoneNumber());
+                ps.setString(4, member.getProvider().getValue());
+                ps.setString(5, member.getRole().getValue());
+                ps.setString(6, member.getAddress());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return memberList.size();
+            }
+        });
+    }
+
+    private void makeBrandMembersBulk(List<String> brandNames) {
+        List<Member> members = new ArrayList<>();
+        for (String brandName : brandNames) {
+            Member member = Member.builder()
+                    .email(brandName + "@naver.com")
+                    .nickName(brandName)
+                    .phoneNumber("010-1234-1234")
+                    .provider(SocialProvider.NAVER)
+                    .role(MemberRole.BRAND_ADMIN)
+                    .brand(brandName)
+                    .build();
+            members.add(member);
+        }
+
+        String sql = "INSERT INTO member (email, nick_name, phone_number, provider, role, brand) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                Member member = members.get(i);
+                ps.setString(1, member.getEmail());
+                ps.setString(2, member.getNickName());
+                ps.setString(3, member.getPhoneNumber());
+                ps.setString(4, member.getProvider().getValue());
+                ps.setString(5, member.getRole().getValue());
+                ps.setString(6, member.getBrand());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return members.size();
+            }
+        });
+    }
+
+    public void saveMainCategoriesBulk(List<String> mainCategoryNames) {
+        List<MainCategory> mainCategories = new ArrayList<>();
+        for (String name : mainCategoryNames) {
+            MainCategory mainCategory = new MainCategory(name);
+            mainCategories.add(mainCategory);
+        }
+        String sql = "INSERT INTO main_category (name) VALUES (?)";
+        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                MainCategory mainCategory = mainCategories.get(i);
+                ps.setString(1, mainCategory.getName());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return mainCategories.size();
+            }
+        });
+    }
+
+    public void saveSubCategoriesBulk(Map<String, List<String>> categories) {
+        String sql = "INSERT INTO sub_category (name, category_id) VALUES (?, ?)";
+        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setString(1, categories.get("상의").get(i));
+                ps.setLong(2, RandomUtils.nextLong(1, 5));
+            }
+
+            @Override
+            public int getBatchSize() {
+                return categories.get("상의").size();
+            }
+        });
+    }
+
+    public void saveProductsBulk(int count) throws InterruptedException {
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        List<Product> products = new CopyOnWriteArrayList<>();
+        for (int n = 1; n <= count; n++) {
+            int currentN = n;
+            executor.execute(() -> {
+                Product product = Product
+                        .builder()
+                        .productCode("P" + UUID.randomUUID())
+                        .title(currentN + " title 멋사입니다. ")
+                        .description(currentN + " description 멋사입니다. ")
+                        .build();
+                Set<Tag> tags = new LinkedHashSet<>();
+                for (int i = 0; i <= 4; i++) {
+                    Tag tag = new Tag(new TagName("tag" + i).getName());
+                    tags.add(tag);
+                }
+                product.updateTags(tags);
+                products.add(product);
+            });
+        }
+
+        executor.shutdown();
+        if (!executor.awaitTermination(1L, TimeUnit.HOURS)) {
+            executor.shutdownNow();
+        }
+
+        String sql = "INSERT INTO product (product_code, title, description, product_option_id, review_count, rate_avg, discount_rate, discounted_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                Product product = products.get(i);
+                ps.setString(1, product.getProductCode());
+                ps.setString(2, product.getTitle());
+                ps.setString(3, product.getDescription());
+                ps.setLong(4, 5);
+                ps.setInt(5, 23);
+                ps.setDouble(6, 1);
+                ps.setDouble(7, 1);
+                ps.setInt(8, 29000);
+            }
+
+            @Override
+            public int getBatchSize() {
+                return products.size();
+            }
+        });
+    }
+
+    public void saveProductOptionsBulk(int count, int fileCount) throws InterruptedException {
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        List<ProductOption> productOptions = new CopyOnWriteArrayList<>();
+        MainCategory mainCategory = mainCategoryService.findByName(dataProperties.getMainCategory().get((int) (Math.random() * 5)));
+        SubCategory subCategory = subCategoryService.findByName(dataProperties.getBottom().get((int) (Math.random() * 5)));
+        for (int i = 0; i < count; i++) {
+            executor.submit(() -> {
+                int stockRandom = 123;
+                int priceRandom = 25000;
+
+                List<String> colors = dataProperties.getColors();
+                List<String> selectedColors = colors.subList(0, colors.size());
+                List<String> inputSizes = new ArrayList<>(dataProperties.getSizes().getTops());
+
+                ProductOption productOption = ProductOption.of(inputSizes, selectedColors, stockRandom, priceRandom);
+                Brand brand = new Brand(dataProperties.getBrand().get((int) (Math.random() * dataProperties.getBrand().size())));
+                productOption.settingConnection(brand, mainCategory, subCategory, null, ProductStatus.SALE);
+                productOptions.add(productOption);
+            });
+        }
+
+        executor.shutdown();
+        if (!executor.awaitTermination(1L, TimeUnit.HOURS)) {
+            executor.shutdownNow();
+        }
+
+        jdbcTemplate.batchUpdate("INSERT INTO brand (name) VALUES (?)", new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setString(1, "멋사");
+            }
+
+            @Override
+            public int getBatchSize() {
+                return 1;
+            }
+        });
+
+        String sql = "INSERT INTO product_option (stock, price, status, common_file_id, main_category_id, sub_category_id, brand_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ProductOption productOption = productOptions.get(i);
+                ps.setInt(1, productOption.getStock());
+                ps.setInt(2, productOption.getPrice());
+                ps.setString(3, productOption.getStatus().getText());
+                ps.setLong(4, 5);
+                ps.setLong(5, 1);
+                ps.setLong(6, 1);
+                ps.setLong(7, 1);
+            }
+
+            @Override
+            public int getBatchSize() {
+                return productOptions.size();
+            }
+        });
+
+        String sqlSize = "INSERT INTO size (name, product_option_id) VALUES (?, ?)";
+        String sqlColor = "INSERT INTO color (name, product_option_id) VALUES (?, ?)";
+        jdbcTemplate.batchUpdate(sqlSize, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setString(1, dataProperties.getSizes().getTops().get(i));
+                ps.setLong(2, 1);
+            }
+
+            @Override
+            public int getBatchSize() {
+                return dataProperties.getSizes().getTops().size();
+            }
+        });
+        jdbcTemplate.batchUpdate(sqlColor, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setString(1, dataProperties.getColors().get(i));
+                ps.setLong(2, 1);
+            }
+
+            @Override
+            public int getBatchSize() {
+                return dataProperties.getColors().size();
+            }
+        });
+    }
+
+    public void saveFilesBulk(int count) {
+        List<CommonFile> commonFiles = new ArrayList<>();
+        for (int idx = 0; idx < count; idx++) {
+            List<String> filenames = listS3ObjectKeys(amazonS3Client, amazonProperties.getS3().getBucket());
+            CommonFile commonFile = CommonFile.builder()
+                    .fileName(selectRandomFilePath(filenames))
+                    .build();
+            for (int i = 0; i < 5; i++) {
+                commonFile.connectFile(CommonFile.builder()
+                        .fileName(selectRandomFilePath(filenames))
+                        .build());
+            }
+            commonFiles.add(commonFile);
+        }
+
+        String sql = "INSERT INTO common_file (file_name) VALUES (?)";
+            jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    CommonFile commonFile = commonFiles.get(i);
+                    ps.setString(1, commonFile.getFileName());
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return count;
+                }
+            });
+    }
+
+    private List<String> listS3ObjectKeys(AmazonS3Client s3Client, String bucketName) {
+        ObjectListing objectListing = s3Client.listObjects(bucketName);
+
+        return objectListing.getObjectSummaries().stream()
+                .map(S3ObjectSummary::getKey)
+                .toList();
+    }
+
+    private String selectRandomFilePath(List<String> filePaths) {
+        Random random = new Random();
+        String path = filePaths.get(random.nextInt(filePaths.size()));
+        while (path.equals("trendpick_logo.png") || path.endsWith("/")) {
+            path = filePaths.get(random.nextInt(filePaths.size()));
+        }
+
+        return path;
+    }
+}

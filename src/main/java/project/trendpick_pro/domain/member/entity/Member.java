@@ -50,18 +50,18 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private Set<FavoriteTag> tags = new LinkedHashSet<>();
 
-    private long restCash;
-
     @Builder
     private Member(String email, String nickName, String phoneNumber,
-                   SocialProvider provider, MemberRole role, String brand,
-                   OAuthTokenResponse socialAuthToken) {
+                   SocialProvider provider, MemberRole role, String brand) {
         this.email = email;
         this.nickName = nickName;
         this.phoneNumber = phoneNumber;
         this.provider = provider;
         this.role = role;
         this.brand = brand;
+    }
+
+    public void connectSocialAuthToken(OAuthTokenResponse socialAuthToken) {
         this.socialAuthToken = new SocialAuthToken(
                 socialAuthToken.getAccessToken(),
                 socialAuthToken.getRefreshToken(),
@@ -85,10 +85,6 @@ public class Member extends BaseTimeEntity {
 
     public void connectAddress(String address) {
         this.address = address;
-    }
-
-    public void connectCash(long cash){
-        this.restCash = cash;
     }
 
     public void changeTags(Set<FavoriteTag> tags) {

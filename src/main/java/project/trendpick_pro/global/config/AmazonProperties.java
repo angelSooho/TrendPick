@@ -7,16 +7,19 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @ConfigurationProperties(prefix = "cloud.aws")
 public class AmazonProperties {
-    @JsonProperty("s3.bucket")
-    private String bucket;
+    private S3 s3;
     private Credentials credentials;
-    @JsonProperty("region.static")
     private String region;
     private String endpoint;
 
     @Data
-    static class Credentials {
+    public static class Credentials {
         private String accessKey;
         private String secretKey;
+    }
+
+    @Data
+    public static class S3 {
+        private String bucket;
     }
 }

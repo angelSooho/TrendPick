@@ -23,12 +23,12 @@ public class AdmWithdrawController {
         return ResponseEntity.ok().body(withdrawService.getWithdraws(email));
     }
 
-    @PreAuthorize("hasAuthority({'ADMIN'})")
-    @PostMapping("/{withdrawApplyId}")
-    public ResponseEntity<Void> applyDone(@PathVariable Long withdrawApplyId) {
-        withdrawService.withdraw(withdrawApplyId);
-        return ResponseEntity.noContent().build();
-    }
+//    @PreAuthorize("hasAuthority({'ADMIN'})")
+//    @PostMapping("/{withdrawApplyId}")
+//    public ResponseEntity<Void> applyDone(@PathVariable Long withdrawApplyId) {
+//        withdrawService.withdraw(withdrawApplyId);
+//        return ResponseEntity.noContent().build();
+//    }
 
     @PreAuthorize("hasAuthority({'ADMIN'})")
     @PostMapping("/{withdrawApplyId}/cancel")

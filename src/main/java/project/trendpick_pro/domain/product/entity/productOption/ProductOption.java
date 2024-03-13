@@ -11,11 +11,15 @@ import project.trendpick_pro.domain.category.entity.SubCategory;
 import project.trendpick_pro.domain.common.file.CommonFile;
 import project.trendpick_pro.domain.product.entity.product.ProductStatus;
 import project.trendpick_pro.domain.product.entity.productOption.dto.ProductOptionSaveRequest;
+import project.trendpick_pro.domain.tags.tag.entity.Tag;
 import project.trendpick_pro.global.exception.BaseException;
 import project.trendpick_pro.global.exception.ErrorCode;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static project.trendpick_pro.domain.product.entity.product.ProductStatus.SALE;
 import static project.trendpick_pro.domain.product.entity.product.ProductStatus.SOLD_OUT;
@@ -23,20 +27,18 @@ import static project.trendpick_pro.domain.product.entity.product.ProductStatus.
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProductOption implements Serializable {
+public class ProductOption {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "product_option_sizes", joinColumns = @JoinColumn(name = "product_option_id"))
+    @OneToMany(cascade = CascadeType.ALL)
     @Column(name = "size")
-    private List<String> sizes;
+    private List<Size> sizes = new ArrayList<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "product_option_colors", joinColumns = @JoinColumn(name = "product_option_id"))
+    @OneToMany(cascade = CascadeType.ALL)
     @Column(name = "color")
-    private List<String> colors;
+    private List<Color> colors = new ArrayList<>();
 
     @Column(name = "stock", nullable = false)
     private int stock;
@@ -64,17 +66,26 @@ public class ProductOption implements Serializable {
     private CommonFile file;
 
     @Builder
-    private ProductOption(List<String> size, List<String> color, int stock, int price) {
+    private ProductOption(List<Size> size, List<Color> color, int stock, int price) {
         this.sizes = size;
         this.colors = color;
         this.stock = stock;
         this.price = price;
     }
 
+    public static ProductOption of(List<String> sizes, List<String> colors, int stock, int price) {
+        return ProductOption.builder()
+                .size(sizes.stream().map(Size::new).toList())
+                .color(colors.stream().map(Color::new).toList())
+                .stock(stock)
+                .price(price)
+                .build();
+    }
+
     public static ProductOption of(ProductOptionSaveRequest request) {
         return ProductOption.builder()
-                .size(request.getSizes())
-                .color(request.getColors())
+                .size(request.getSizes().stream().map(Size::new).toList())
+                .color(request.getColors().stream().map(Color::new).toList())
                 .stock(request.getStock())
                 .price(request.getPrice())
                 .build();
@@ -93,8 +104,8 @@ public class ProductOption implements Serializable {
     }
 
     public void update(ProductOptionSaveRequest request) {
-        this.sizes = request.getSizes();
-        this.colors = request.getColors();
+        this.sizes = request.getSizes().stream().map(Size::new).toList();
+        this.colors = request.getColors().stream().map(Color::new).toList();
         this.stock = request.getStock();
         this.price = request.getPrice();
     }

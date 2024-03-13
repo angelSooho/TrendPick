@@ -36,6 +36,7 @@ public class Product extends BaseTimeEntity {
     private Set<Tag> tags = new LinkedHashSet<>();
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "product_option_id")
     private ProductOption productOption;
 
     private int reviewCount = 0;

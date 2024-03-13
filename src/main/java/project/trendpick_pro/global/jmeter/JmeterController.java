@@ -7,23 +7,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import project.trendpick_pro.domain.member.controller.annotation.MemberEmail;
 import project.trendpick_pro.domain.member.entity.Member;
 import project.trendpick_pro.domain.member.entity.dto.MemberInfoResponse;
 import project.trendpick_pro.domain.member.service.MemberService;
 import project.trendpick_pro.domain.orders.service.OrderService;
-import project.trendpick_pro.domain.product.entity.dto.ProductRequest;
-import project.trendpick_pro.domain.product.entity.product.Product;
-import project.trendpick_pro.domain.product.entity.product.dto.request.ProductSaveRequest;
-import project.trendpick_pro.domain.product.entity.productOption.dto.ProductOptionSaveRequest;
 import project.trendpick_pro.domain.product.service.ProductService;
-import project.trendpick_pro.domain.tags.tag.entity.Tag;
 import project.trendpick_pro.global.kafka.KafkaProducerService;
-
-import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -58,29 +52,5 @@ public class JmeterController {
         String color = "Sliver";
 
         orderService.productToOrder(email, id, quantity, size, color);
-    }
-
-    @PostMapping("/edit")
-    public void modifyProduct(@RequestParam("productId") Long productId,
-                              @RequestParam("mainFile") MultipartFile mainFile,
-                              @RequestParam("subFile") List<MultipartFile> subFiles) throws IOException {
-        Product product = productService.findById(productId);
-
-        ProductSaveRequest productSaveRequest = new ProductSaveRequest(
-                product.getTitle(), product.getDescription(),
-                product.getProductOption().getMainCategory().getName(),
-                product.getProductOption().getSubCategory().getName(),
-                product.getProductOption().getBrand().getName(),
-                product.getTags().stream().map(Tag::getName).toList()
-        );
-
-        ProductOptionSaveRequest productOptionSaveRequest = ProductOptionSaveRequest.of(
-                product.getProductOption().getSizes(), product.getProductOption().getColors(),
-                product.getProductOption().getStock(), product.getProductOption().getPrice(),
-                product.getProductOption().getStatus().getText()
-        );
-
-        ProductRequest productRequest = new ProductRequest(productSaveRequest, productOptionSaveRequest);
-        productService.modifyProduct(productId, productRequest, mainFile, subFiles);
     }
 }

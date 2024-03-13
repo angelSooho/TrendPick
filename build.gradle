@@ -89,6 +89,10 @@ dependencies {
     implementation 'org.json:json:20240303'
 }
 
+compileJava {
+    options.compilerArgs += ['-parameters']
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }
