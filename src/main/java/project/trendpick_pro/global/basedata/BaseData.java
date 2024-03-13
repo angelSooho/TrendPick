@@ -94,8 +94,7 @@ public class BaseData implements
         long endTime = System.currentTimeMillis();
         double resultTime = (endTime - startTime) / 1000.0;
         if (resultTime > 60) {
-            resultTime /= 60;
-            log.info("{}: {} min", taskName, resultTime);
+            log.info("{}: {} min", taskName, resultTime / 60);
         } else {
             log.info("{}: {} sec", taskName, resultTime);
         }
