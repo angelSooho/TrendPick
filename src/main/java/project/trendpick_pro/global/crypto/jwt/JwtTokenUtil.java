@@ -34,7 +34,6 @@ public class JwtTokenUtil {
     private final JwtProperties jwtProperties;
     private SecretKey secretKey;
 
-    private final MemberService memberService;
     private final JwtTokenService jwtTokenService;
 
     @PostConstruct
@@ -51,7 +50,7 @@ public class JwtTokenUtil {
     public String getTokenFromCookie(String tokenType, HttpServletRequest request) {
         String header;
         if (request.getHeader("cookie") == null) {
-            throw new BaseException(ErrorCode.NOT_FOUND);
+            throw new BaseException(ErrorCode.NOT_FOUND, "쿠키가 없습니다.");
         } else {
             header = request.getHeader("cookie");
         }
@@ -122,8 +121,7 @@ public class JwtTokenUtil {
         return cookie;
     }
 
-    public Authentication getAuthentication(String token) {
-        Member member = memberService.findByEmail(getEmail(token));
+    public Authentication getAuthentication(Member member) {
         UserDetails user = User.builder()
                 .username(member.getEmail())
                 .password("")
@@ -132,7 +130,7 @@ public class JwtTokenUtil {
         return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
     }
 
-    private String getEmail(String token) {
+    public String getEmail(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()

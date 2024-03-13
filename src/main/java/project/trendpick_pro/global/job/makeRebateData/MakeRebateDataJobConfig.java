@@ -12,22 +12,13 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.data.RepositoryItemReader;
-import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.domain.Sort;
 import org.springframework.transaction.PlatformTransactionManager;
 import project.trendpick_pro.domain.orders.entity.OrderItem;
 import project.trendpick_pro.domain.orders.repository.OrderItemRepository;
 import project.trendpick_pro.domain.rebate.entity.RebateOrderItem;
 import project.trendpick_pro.domain.rebate.repository.RebateOrderItemRepository;
-import project.trendpick_pro.global.util.Ut;
-
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
 
 @Configuration
 @RequiredArgsConstructor
@@ -60,24 +51,24 @@ public class MakeRebateDataJobConfig {
                 .build();
     }
 
-    @StepScope
-    @Bean
-    public RepositoryItemReader<OrderItem> orderItemReader(
-            @Value("#{jobParameters['yearMonth']}") String yearMonth
-    ) {
-        int monthEndDay = Ut.date.getEndDayOf(yearMonth);
-        LocalDateTime fromDate = Ut.date.parse(yearMonth + "-01 00:00:00.000000");
-        LocalDateTime toDate = Ut.date.parse(yearMonth + "-%02d 23:59:59.999999".formatted(monthEndDay));
-
-        return new RepositoryItemReaderBuilder<OrderItem>()
-                .name("orderItemReader")
-                .repository(orderItemRepository)
-                .methodName("findAllByCreatedDateBetween")
-                .pageSize(100)
-                .arguments(Arrays.asList(fromDate, toDate))
-                .sorts(Collections.singletonMap("id", Sort.Direction.ASC))
-                .build();
-    }
+//    @StepScope
+//    @Bean
+//    public RepositoryItemReader<OrderItem> orderItemReader(
+//            @Value("#{jobParameters['yearMonth']}") String yearMonth
+//    ) {
+//        int monthEndDay = Ut.date.getEndDayOf(yearMonth);
+//        LocalDateTime fromDate = Ut.date.parse(yearMonth + "-01 00:00:00.000000");
+//        LocalDateTime toDate = Ut.date.parse(yearMonth + "-%02d 23:59:59.999999".formatted(monthEndDay));
+//
+//        return new RepositoryItemReaderBuilder<OrderItem>()
+//                .name("orderItemReader")
+//                .repository(orderItemRepository)
+//                .methodName("findAllByCreatedDateBetween")
+//                .pageSize(100)
+//                .arguments(Arrays.asList(fromDate, toDate))
+//                .sorts(Collections.singletonMap("id", Sort.Direction.ASC))
+//                .build();
+//    }
 
     @StepScope
     @Bean

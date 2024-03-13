@@ -1,8 +1,7 @@
 package project.trendpick_pro.domain.product.service;
 
-import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +28,6 @@ import project.trendpick_pro.domain.product.entity.product.dto.request.ProductSa
 import project.trendpick_pro.domain.product.entity.product.dto.request.ProductSearchCond;
 import project.trendpick_pro.domain.product.entity.product.dto.response.ProductByRecommended;
 import project.trendpick_pro.domain.product.entity.product.dto.response.ProductListResponse;
-import project.trendpick_pro.domain.product.entity.product.dto.response.ProductListResponseBySeller;
 import project.trendpick_pro.domain.product.entity.product.dto.response.ProductResponse;
 import project.trendpick_pro.domain.product.entity.productOption.ProductOption;
 import project.trendpick_pro.domain.product.entity.productOption.dto.ProductOptionSaveRequest;
@@ -41,6 +39,7 @@ import project.trendpick_pro.domain.tags.favoritetag.service.FavoriteTagService;
 import project.trendpick_pro.domain.tags.tag.entity.Tag;
 import project.trendpick_pro.domain.tags.tag.entity.TagType;
 import project.trendpick_pro.domain.tags.tag.service.TagService;
+import project.trendpick_pro.global.config.AmazonProperties;
 import project.trendpick_pro.global.exception.BaseException;
 import project.trendpick_pro.global.exception.ErrorCode;
 
@@ -65,9 +64,8 @@ public class ProductService {
     private final FavoriteTagService favoriteTagService;
     private final TagService tagService;
 
-    private final AmazonS3 amazonS3;
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucket;
+    private final AmazonS3Client amazonS3;
+    private final AmazonProperties amazonProperties;
 
     @Transactional
     public Long saveProduct(ProductRequest request, MultipartFile requestMainFile, List<MultipartFile> requestSubFiles) {
@@ -104,7 +102,7 @@ public class ProductService {
         List<CommonFile> subFiles = fileTranslator.saveFiles(requestSubFiles);
         subFiles.forEach(mainFile::connectFile);
 
-        product.getProductOption().getFile().deleteFile(amazonS3, bucket);
+        product.getProductOption().getFile().deleteFile(amazonS3, amazonProperties.getBucket());
         product.getProductOption().updateFile(mainFile);
 
         Set<Tag> tags = new LinkedHashSet<>();
@@ -119,7 +117,7 @@ public class ProductService {
     @Transactional
     public void delete(Long productId) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND, "존재하지 않는 상품입니다."));
-        product.getProductOption().getFile().deleteFile(amazonS3, bucket);
+        product.getProductOption().getFile().deleteFile(amazonS3, amazonProperties.getBucket());
         productRepository.delete(product);
     }
 
@@ -183,15 +181,6 @@ public class ProductService {
             ));
         }
         return products;
-    }
-
-    public Page<ProductListResponseBySeller> findProductsBySeller(String email, int offset) {
-        Member member = memberService.findByEmail(email);
-        if (member.getBrand() == null){
-            throw new BaseException(ErrorCode.BAD_REQUEST, "브랜드 정보가 없습니다.");
-        }
-        Pageable pageable = PageRequest.of(offset, 20);
-        return productRepository.findAllBySeller(member.getBrand(), pageable);
     }
 
     @Transactional

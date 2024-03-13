@@ -1,6 +1,5 @@
 package project.trendpick_pro.domain.product.repository;
 
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -93,41 +92,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     }
 
     @Override
-    public Page<ProductListResponseBySeller> findAllBySeller(String brand, Pageable pageable) {
-        List<ProductListResponseBySeller> list = queryFactory
-                .select(new QProductListResponseBySeller(
-                        product.id,
-                        product.title,
-                        commonFile.fileName,
-                        productOption.price,
-                        productOption.stock,
-                        product.createdDate,
-                        product.saleCount,
-                        product.rateAvg,
-                        product.reviewCount,
-                        product.askCount,
-                        product.discountRate,
-                        product.discountedPrice
-                ))
-                .from(product)
-                .leftJoin(product.productOption, productOption)
-                .leftJoin(productOption.file, commonFile)
-                .where(productOption.brand.name.eq(brand))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .orderBy(product.createdDate.desc())
-                .fetch();
-
-        JPAQuery<Long> count = queryFactory
-                .select(product.count())
-                .from(product)
-                .leftJoin(product.productOption.file, commonFile)
-                .where(product.productOption.brand.name.eq(brand));
-
-        return PageableExecutionUtils.getPage(list, pageable, count::fetchOne);
-    }
-
-    @Override
     public Page<ProductListResponse> findAllByKeyword(ProductSearchCond cond, Pageable pageable) {
         List<ProductListResponse> result = queryFactory
                 .select(new QProductListResponse(
@@ -188,16 +152,5 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         } else {
             return subCategory.name.eq(cond.getSubCategory());
         }
-    }
-
-    private static OrderSpecifier<?>
-    orderSelector(Integer sortCode) {
-        return switch (sortCode) {
-            case 2 -> product.id.asc();
-            case 3 -> product.rateAvg.desc();
-            case 4 -> product.rateAvg.asc();
-            case 5 -> product.reviewCount.desc();
-            default -> product.id.desc();
-        };
     }
 }

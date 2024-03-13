@@ -28,11 +28,8 @@ public class AskRepositoryImpl implements AskRepositoryCustom {
     public Page<AskResponse> findAllByProductId(Long productId, Pageable pageable) {
         List<AskResponse> result = queryFactory
                 .select(new QAskResponse(
-                        ask.id,
-                        product.id,
                         product.title,
-                        member.username,
-                        member.id,
+                        member.nickName,
                         ask.title,
                         ask.content,
                         ask.status.stringValue(),

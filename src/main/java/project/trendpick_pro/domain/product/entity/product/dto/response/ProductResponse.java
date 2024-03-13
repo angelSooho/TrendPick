@@ -20,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProductResponse implements Serializable {
 
-    private Long id;
+    private String productCode;
     private String name;
     private String mainCategory;
     private String subCategory;
@@ -39,10 +39,10 @@ public class ProductResponse implements Serializable {
 
     @Builder
     @QueryProjection
-    public ProductResponse(Long id, String name, String mainCategory, String subCategory, String brand, String description,
+    public ProductResponse(String productCode, String name, String mainCategory, String subCategory, String brand, String description,
                            String mainFile, List<String> subFiles, List<String> sizes, List<String> colors, int price, List<String> tags,
                            double discountRate, int discountedPrice, Page<ReviewProductResponse> reviewResponse, Page<AskResponse> askResponse) {
-        this.id = id;
+        this.productCode = productCode;
         this.name = name;
         this.mainCategory = mainCategory;
         this.subCategory = subCategory;
@@ -63,7 +63,7 @@ public class ProductResponse implements Serializable {
     public static ProductResponse of (Product product, Page<ReviewProductResponse> reviewResponse, Page<AskResponse> askResponse) {
         if (product.getDiscountedPrice() == 0 && product.getDiscountRate() == 0) {
             return ProductResponse.builder()
-                    .id(product.getId())
+                    .productCode(product.getProductCode())
                     .name(product.getTitle())
                     .mainCategory(product.getProductOption().getMainCategory().getName())
                     .subCategory(product.getProductOption().getSubCategory().getName())
@@ -80,7 +80,7 @@ public class ProductResponse implements Serializable {
                     .build();
         } else {
             return ProductResponse.builder()
-                    .id(product.getId())
+                    .productCode(product.getProductCode())
                     .name(product.getTitle())
                     .mainCategory(product.getProductOption().getMainCategory().getName())
                     .subCategory(product.getProductOption().getSubCategory().getName())

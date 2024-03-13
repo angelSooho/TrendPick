@@ -27,7 +27,8 @@ public class NotificationService {
     private final OrderService orderService;
     private final MemberService memberService;
 
-    public void saveNotification(Member member, Long orderId) {
+    public void saveNotification(String email, Long orderId) {
+        Member member = memberService.findByEmail(email);
         Order order=orderService.findById(orderId);
         if(!order.getOrderState().equals("미결제")) {
             Notification notification = Notification.of(member, order);

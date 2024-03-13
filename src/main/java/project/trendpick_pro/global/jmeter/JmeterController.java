@@ -18,10 +18,9 @@ import project.trendpick_pro.domain.product.entity.dto.ProductRequest;
 import project.trendpick_pro.domain.product.entity.product.Product;
 import project.trendpick_pro.domain.product.entity.product.dto.request.ProductSaveRequest;
 import project.trendpick_pro.domain.product.entity.productOption.dto.ProductOptionSaveRequest;
+import project.trendpick_pro.domain.product.service.ProductService;
 import project.trendpick_pro.domain.tags.tag.entity.Tag;
 import project.trendpick_pro.global.kafka.KafkaProducerService;
-import project.trendpick_pro.global.util.rq.Rq;
-import project.trendpick_pro.global.util.rsData.RsData;
 
 import java.io.IOException;
 import java.util.List;
@@ -82,6 +81,6 @@ public class JmeterController {
         );
 
         ProductRequest productRequest = new ProductRequest(productSaveRequest, productOptionSaveRequest);
-        productService.modify(productId, productRequest, mainFile, subFiles);
+        productService.modifyProduct(productId, productRequest, mainFile, subFiles);
     }
 }

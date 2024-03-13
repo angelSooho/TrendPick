@@ -12,6 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+import project.trendpick_pro.domain.member.entity.Member;
+import project.trendpick_pro.domain.member.service.MemberService;
 import project.trendpick_pro.global.crypto.jwt.JwtToken.JwtTokenService;
 import project.trendpick_pro.global.crypto.jwt.exception.FilterException;
 import project.trendpick_pro.global.crypto.jwt.exception.FilterExceptionResponse;
@@ -25,11 +27,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
     private final JwtTokenService jwtTokenService;
+    private final MemberService memberService;
 
     private final ObjectMapper objectMapper;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
         try {
             if (request.getRequestURI().contains("login")) {
                 boolean isToken = jwtTokenUtil.checkTokenFromCookie("accessToken", request);
@@ -49,7 +52,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 if (!jwtTokenUtil.verifyToken(refreshToken) && jwtTokenService.verifyToken("refreshToken", refreshToken)) {
                     throw new FilterException(ErrorCode.INVALID_TOKEN, "유효하지 않은 토큰입니다.");
                 } else {
-                    Authentication authentication = jwtTokenUtil.getAuthentication(refreshToken);
+                    String email = jwtTokenUtil.getEmail(refreshToken);
+                    Member member = memberService.findByEmail(email);
+                    Authentication authentication = jwtTokenUtil.getAuthentication(member);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             } else {
@@ -60,7 +65,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 if (!jwtTokenUtil.verifyToken(accessToken) && jwtTokenService.verifyToken("accessToken", accessToken)) {
                     throw new FilterException(ErrorCode.INVALID_TOKEN, "유효하지 않은 토큰입니다.");
                 } else {
-                    Authentication authentication = jwtTokenUtil.getAuthentication(accessToken);
+                    String email = jwtTokenUtil.getEmail(accessToken);
+                    Member member = memberService.findByEmail(email);
+                    Authentication authentication = jwtTokenUtil.getAuthentication(member);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }

@@ -1,6 +1,6 @@
 package project.trendpick_pro.global.tosspayment.service;
 
-import net.minidev.json.JSONObject;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -13,7 +13,6 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
-import java.util.Objects;
 
 @Service
 public class PaymentService {

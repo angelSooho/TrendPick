@@ -1,8 +1,8 @@
 package project.trendpick_pro.domain.review.service;
 
-import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,9 +20,11 @@ import project.trendpick_pro.domain.review.entity.dto.request.ReviewSaveRequest;
 import project.trendpick_pro.domain.review.entity.dto.response.ReviewProductResponse;
 import project.trendpick_pro.domain.review.entity.dto.response.ReviewResponse;
 import project.trendpick_pro.domain.review.repository.ReviewRepository;
+import project.trendpick_pro.global.config.AmazonProperties;
 
 import java.util.List;
 
+@Lazy
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -34,10 +36,8 @@ public class ReviewService {
     private final MemberService memberService;
     private final ProductService productService;
 
-    private final AmazonS3 amazonS3;
-
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucket;
+    private final AmazonS3Client amazonS3;
+    private final AmazonProperties amazonProperties;
 
     @Transactional
     public ReviewResponse save(String email, Long productId, ReviewSaveRequest reviewSaveRequest, MultipartFile requestMainFile, List<MultipartFile> requestSubFiles) {
@@ -61,7 +61,7 @@ public class ReviewService {
     public ReviewResponse modify(Long reviewId, ReviewSaveRequest reviewSaveRequest, MultipartFile requestMainFile, List<MultipartFile> requestSubFiles) {
         Review review = reviewRepository.findById(reviewId).orElseThrow();
 
-        review.getFile().deleteFile(amazonS3, bucket);
+        review.getFile().deleteFile(amazonS3, amazonProperties.getBucket());
         review.disconnectFile();
 
         CommonFile mainFile = fileTranslator.saveFile(requestMainFile);
@@ -78,7 +78,7 @@ public class ReviewService {
     @Transactional
     public void delete(Long reviewId) {
         Review review = reviewRepository.findById(reviewId).orElseThrow();
-        review.getFile().deleteFile(amazonS3, bucket);
+        review.getFile().deleteFile(amazonS3, amazonProperties.getBucket());
         reviewRepository.delete(review);
     }
 

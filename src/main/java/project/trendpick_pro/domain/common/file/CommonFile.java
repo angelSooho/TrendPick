@@ -1,6 +1,7 @@
 package project.trendpick_pro.domain.common.file;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -42,7 +43,7 @@ public class CommonFile {
         this.parent = parent;
     }
 
-    public void deleteFile(AmazonS3 amazonS3, String bucket){
+    public void deleteFile(AmazonS3Client amazonS3, String bucket){
         DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, this.fileName);
         amazonS3.deleteObject(deleteObjectRequest);
 

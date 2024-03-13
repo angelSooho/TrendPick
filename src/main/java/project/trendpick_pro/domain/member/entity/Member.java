@@ -75,6 +75,10 @@ public class Member extends BaseTimeEntity {
         this.socialAuthToken.updateToken(response);
     }
 
+    public void updateAuthToken(SocialAuthToken socialAuthToken) {
+        this.socialAuthToken = socialAuthToken;
+    }
+
     public void connectBrand(String brand){
         this.brand = brand;
     }

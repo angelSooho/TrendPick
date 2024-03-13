@@ -8,16 +8,12 @@ import project.trendpick_pro.domain.ask.entity.Ask;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@ToString
 @Getter
 @NoArgsConstructor
-public class AskResponse implements Serializable {
+public class AskResponse {
 
-    private Long askId;
-    private Long productId;
     private String productName;
     private String memberName;
-    private Long memberId;
     private String title;
     private String content;
     private String status;
@@ -25,13 +21,10 @@ public class AskResponse implements Serializable {
 
     @Builder
     @QueryProjection
-    public AskResponse(Long askId, Long productId, String productName, String memberName, Long memberId, String title,
+    public AskResponse(String productName, String memberName, String title,
                        String content, String status, LocalDateTime createdDate) {
-        this.askId = askId;
-        this.productId = productId;
         this.productName = productName;
         this.memberName = memberName;
-        this.memberId = memberId;
         this.title = title;
         this.content = content;
         this.status = status;
@@ -40,10 +33,7 @@ public class AskResponse implements Serializable {
 
     public static AskResponse of (Ask ask) {
         return AskResponse.builder()
-                .askId(ask.getId())
                 .memberName(ask.getAuthor().getNickName())
-                .memberId(ask.getAuthor().getId())
-                .productId(ask.getProduct().getId())
                 .productName(ask.getProduct().getTitle())
                 .title(ask.getTitle())
                 .content(ask.getContent())

@@ -14,8 +14,6 @@ import java.util.Locale;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderResponse {
-    private Long orderId;
-    private Long productId;
     private String productFilePath;
     private String brandName;
     private String productName;
@@ -31,10 +29,8 @@ public class OrderResponse {
 
     @Builder
     @QueryProjection
-    public OrderResponse(Long orderId, Long productId, String productFilePath, String brandName, String productName, int count,int productPrice, int discountPrice, LocalDateTime orderDate, LocalDateTime canceledDate,
+    public OrderResponse(String productFilePath, String brandName, String productName, int count,int productPrice, int discountPrice, LocalDateTime orderDate, LocalDateTime canceledDate,
                          String size, String color, String orderStatus, String deliveryStatus) {
-        this.orderId = orderId;
-        this.productId = productId;
         this.productFilePath = productFilePath;
         this.brandName = brandName;
         this.productName = productName;
@@ -51,8 +47,6 @@ public class OrderResponse {
 
     public static OrderResponse of(Order order) {
         return OrderResponse.builder()
-                .orderId(order.getId())
-                .productId(order.getOrderItems().get(0).getProduct().getId())
                 .productFilePath(order.getOrderItems().get(0).getProduct().getProductOption().getFile().getFileName())
                 .brandName(order.getMember().getBrand())
                 .productName(order.getOrderItems().get(0).getProduct().getTitle())

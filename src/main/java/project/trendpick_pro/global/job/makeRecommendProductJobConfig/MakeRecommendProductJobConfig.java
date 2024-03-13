@@ -25,12 +25,13 @@ import project.trendpick_pro.domain.member.entity.MemberRole;
 import project.trendpick_pro.domain.member.repository.MemberRepository;
 import project.trendpick_pro.domain.product.entity.product.Product;
 import project.trendpick_pro.domain.product.entity.product.dto.response.ProductByRecommended;
-import project.trendpick_pro.domain.product.exception.ProductNotFoundException;
 import project.trendpick_pro.domain.product.repository.ProductRepository;
 import project.trendpick_pro.domain.recommend.entity.Recommend;
 import project.trendpick_pro.domain.recommend.repository.JdbcRecommendRepository;
 import project.trendpick_pro.domain.recommend.repository.RecommendRepository;
 import project.trendpick_pro.domain.tags.favoritetag.entity.FavoriteTag;
+import project.trendpick_pro.global.exception.BaseException;
+import project.trendpick_pro.global.exception.ErrorCode;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -145,7 +146,7 @@ public class MakeRecommendProductJobConfig {
                 List<Product> products = new ArrayList<>();
                 for (ProductByRecommended recommendProduct : recommendProductList) {
                     products.add(productRepository.findById(recommendProduct.getProductId()).orElseThrow(
-                            () -> new ProductNotFoundException("존재하지 않는 상품입니다.")
+                            () -> new BaseException(ErrorCode.NOT_FOUND, "상품이 존재하지 않습니다.")
                     ));
                 }
 

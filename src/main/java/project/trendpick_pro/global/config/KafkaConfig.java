@@ -23,10 +23,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class KafkaConfig {
 
-    @Value("${kafka.host}")
+    @Value("${spring.kafka.host}")
     private String kafkaHost;
 
-    @Value("${kafka.port}")
+    @Value("${spring.kafka.port}")
     private String kafkaPort;
 
     private final ConsumerFactory<String, String> consumerFactory;

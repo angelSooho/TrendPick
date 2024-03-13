@@ -9,12 +9,13 @@ import org.springframework.transaction.annotation.Transactional;
 import project.trendpick_pro.domain.ask.entity.Ask;
 import project.trendpick_pro.domain.ask.entity.dto.form.AskRequest;
 import project.trendpick_pro.domain.ask.entity.dto.response.AskResponse;
-import project.trendpick_pro.domain.ask.exception.AskNotFoundException;
-import project.trendpick_pro.domain.ask.exception.AskNotMatchException;
 import project.trendpick_pro.domain.ask.repository.AskRepository;
 import project.trendpick_pro.domain.member.entity.Member;
 import project.trendpick_pro.domain.member.service.MemberService;
 import project.trendpick_pro.domain.product.entity.product.Product;
+import project.trendpick_pro.domain.product.service.ProductService;
+import project.trendpick_pro.global.exception.BaseException;
+import project.trendpick_pro.global.exception.ErrorCode;
 
 import java.util.Objects;
 
@@ -56,7 +57,7 @@ public class AskService {
     public AskResponse getAsk(Long askId) {
         return AskResponse.of(
             askRepository.findById(askId)
-                .orElseThrow(() -> new AskNotFoundException("해당 문의글은 존재하지 않습니다."))
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND, "해당 문의글은 존재하지 않습니다."))
         );
     }
 
@@ -67,9 +68,9 @@ public class AskService {
 
     private Ask getAskWithAuthValidation(Member member, Long askId) {
         Ask ask = askRepository.findById(askId)
-                .orElseThrow(() -> new AskNotFoundException("해당 문의글은 존재하지 않습니다."));
+                .orElseThrow(() ->new BaseException(ErrorCode.NOT_FOUND, "해당 문의글은 존재하지 않습니다."));
         if (!Objects.equals(ask.getAuthor().getId(), member.getId())) {
-            throw new AskNotMatchException("해당 문의에 대한 권한이 없습니다.");
+            throw new BaseException(ErrorCode.BAD_REQUEST, "해당 문의글은 존재하지 않습니다.");
         }
         return ask;
     }

@@ -18,9 +18,10 @@ import project.trendpick_pro.domain.member.controller.MemberController;
 import project.trendpick_pro.domain.member.repository.MemberRepository;
 import project.trendpick_pro.domain.member.service.MemberService;
 import project.trendpick_pro.domain.orders.contoller.OrderController;
+import project.trendpick_pro.domain.orders.service.OrderService;
+import project.trendpick_pro.domain.product.service.ProductService;
 import project.trendpick_pro.global.basedata.tagname.service.TagNameService;
 import project.trendpick_pro.global.crypto.SecurityConfig;
-import project.trendpick_pro.global.util.rq.Rq;
 
 @Import(SecurityConfig.class)
 @ActiveProfiles("test")
@@ -40,9 +41,6 @@ public abstract class ControllerTestSupport {
 
     @Autowired
     protected ObjectMapper objectMapper;
-
-    @MockBean
-    protected Rq rq;
 
     @MockBean
     protected TagNameService tagNameService;

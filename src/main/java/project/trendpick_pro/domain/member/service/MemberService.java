@@ -4,16 +4,13 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.trendpick_pro.domain.brand.entity.Brand;
-import project.trendpick_pro.domain.brand.service.BrandService;
 import project.trendpick_pro.domain.cash.entity.CashLog;
 import project.trendpick_pro.domain.cash.entity.dto.CashResponse;
-import project.trendpick_pro.domain.cash.service.CashService;
 import project.trendpick_pro.domain.common.file.JsonConvertor;
 import project.trendpick_pro.domain.common.file.NickName;
 import project.trendpick_pro.domain.member.entity.Member;
@@ -22,8 +19,6 @@ import project.trendpick_pro.domain.member.entity.SocialAuthToken;
 import project.trendpick_pro.domain.member.entity.SocialProvider;
 import project.trendpick_pro.domain.member.entity.dto.MemberInfoResponse;
 import project.trendpick_pro.domain.member.repository.MemberRepository;
-import project.trendpick_pro.domain.recommend.service.RecommendService;
-import project.trendpick_pro.domain.store.entity.Store;
 import project.trendpick_pro.domain.tags.favoritetag.entity.FavoriteTag;
 import project.trendpick_pro.domain.tags.tag.entity.dto.request.TagRequest;
 import project.trendpick_pro.global.crypto.jwt.JwtToken.JwtTokenService;
@@ -44,7 +39,6 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -57,12 +51,6 @@ public class MemberService  {
 
     private final JwtTokenUtil jwtTokenUtil;
     private final OAuthClientProperties oAuthClientProperties;
-
-    private final RecommendService recommendService;
-    private final StoreService storeService;
-    private final CashService cashService;
-    private final BrandService brandService;
-    
     private final JsonConvertor jsonConvertor;
 
     @Transactional
@@ -109,8 +97,9 @@ public class MemberService  {
         jwtTokenUtil.verifyToken(refreshToken);
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND, "해당 이메일로 가입된 회원이 없습니다."));
         SocialAuthToken reissueSocialToken = oAuthService.verifyAndReissueSocialToken(member.getSocialAuthToken(), member.getProvider());
+        member.updateAuthToken(reissueSocialToken);
 
-        Authentication authentication = jwtTokenUtil.getAuthentication(refreshToken);
+        Authentication authentication = jwtTokenUtil.getAuthentication(member);
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -190,27 +179,12 @@ public class MemberService  {
         return memberRepository.findById(member.getId()).get().getRestCash();
     }
 
-    private void checkingMemberType(Member member) {
-        if (member.getRole() == MemberRole.MEMBER) {
-            recommendService.rankRecommend(member);
-        }
-    }
-
-    private Member settingMember(Member member, String brand, List<String> tags) {
+    private void settingMember(Member member, String brand, List<String> tags) {
         if (member.getRole() == MemberRole.BRAND_ADMIN) {
             member.connectBrand(brand);
-            saveBrandAndStoreIfNotExists(brand);
         }
         if (tags != null) {
             member.changeTags(createFavoriteTags(tags));
-        }
-        return member;
-    }
-
-    private void saveBrandAndStoreIfNotExists(String brand) {
-        if (!brandService.isPresent(brand)) {
-            brandService.save(brand);
-            storeService.save(new Store(brand));
         }
     }
 

@@ -41,7 +41,7 @@ public class RecommendRepositoryImpl implements RecommendRepositoryCustom {
                 .leftJoin(recommend.member, member)
                 .leftJoin(recommend.product, product)
                 .leftJoin(product.productOption, productOption)
-                .where(recommend.member.username.eq(email))
+                .where(recommend.member.nickName.eq(email))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -51,7 +51,7 @@ public class RecommendRepositoryImpl implements RecommendRepositoryCustom {
                 .from(recommend)
                 .leftJoin(recommend.member, member)
                 .leftJoin(recommend.product, product)
-                .where(recommend.member.username.eq(email));
+                .where(recommend.member.nickName.eq(email));
 
         return PageableExecutionUtils.getPage(result, pageable, count::fetchOne);
     }

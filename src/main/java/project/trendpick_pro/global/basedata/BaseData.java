@@ -8,24 +8,22 @@
 //import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 //import com.amazonaws.services.s3.model.ObjectListing;
 //import com.amazonaws.services.s3.model.S3ObjectSummary;
-//import lombok.extern.slf4j.Slf4j;
-//import org.springframework.beans.factory.annotation.Value;
+//import jakarta.annotation.PostConstruct;
+//import lombok.RequiredArgsConstructor;
 //import org.springframework.boot.CommandLineRunner;
 //import org.springframework.context.annotation.Bean;
 //import org.springframework.context.annotation.Configuration;
 //import org.springframework.context.annotation.Profile;
+//import org.springframework.jdbc.core.JdbcTemplate;
 //import org.springframework.transaction.annotation.Transactional;
 //import project.trendpick_pro.domain.brand.entity.Brand;
 //import project.trendpick_pro.domain.category.entity.MainCategory;
 //import project.trendpick_pro.domain.category.entity.SubCategory;
 //import project.trendpick_pro.domain.common.file.CommonFile;
-//import project.trendpick_pro.domain.coupon.entity.expirationPeriod.ExpirationType;
-//import project.trendpick_pro.global.kafka.view.service.ViewService;
 //import project.trendpick_pro.domain.coupon.entity.Coupon;
-//import project.trendpick_pro.domain.coupon.entity.dto.request.StoreCouponSaveRequest;
+//import project.trendpick_pro.domain.coupon.entity.expirationPeriod.ExpirationType;
 //import project.trendpick_pro.domain.coupon.repository.CouponRepository;
 //import project.trendpick_pro.domain.member.entity.Member;
-//import project.trendpick_pro.domain.member.entity.form.JoinForm;
 //import project.trendpick_pro.domain.product.entity.product.Product;
 //import project.trendpick_pro.domain.product.entity.product.ProductStatus;
 //import project.trendpick_pro.domain.product.entity.productOption.ProductOption;
@@ -41,64 +39,26 @@
 //import project.trendpick_pro.domain.tags.tag.entity.Tag;
 //import project.trendpick_pro.global.basedata.tagname.entity.TagName;
 //import project.trendpick_pro.global.basedata.tagname.service.TagNameService;
-//import project.trendpick_pro.global.util.rsData.RsData;
+//import project.trendpick_pro.global.config.AmazonProperties;
+//import project.trendpick_pro.global.config.DataProperties;
+//import project.trendpick_pro.global.kafka.view.service.ViewService;
 //
 //import java.util.*;
 //
-//@Slf4j
 //@Configuration
 //@Profile({"dev"})
+//@RequiredArgsConstructor
 //public class BaseData {
 //
-//    @Value("${tag}")
-//    private List<String> tags;
-//    @Value("${main-category}")
-//    private List<String> mainCategories;
-//    @Value("${top}")
-//    private List<String> tops;
-//    @Value("${outer}")
-//    private List<String> outers;
-//    @Value("${bottom}")
-//    private List<String> bottoms;
-//    @Value("${shoes}")
-//    private List<String> shoes;
-//    @Value("${bag}")
-//    private List<String> bags;
-//    @Value("${accessory}")
-//    private List<String> accessories;
-//    @Value("${brand}")
-//    private List<String> brands;
-//    @Value("${sizes.tops}")
-//    private List<String> sizeTops;
-//    @Value("${sizes.bottoms}")
-//    private List<String> sizeBottoms;
-//    @Value("${sizes.shoes}")
-//    private List<String> sizeShoes;
-//    @Value("${colors}")
-//    private List<String> colors;
+//    private final AmazonProperties amazonProperties;
+//    private final DataProperties dataProperties;
 //
-//    @Value("${cloud.aws.s3.bucket}")
-//    private String bucket;
-//    @Value("${cloud.aws.credentials.accessKey}")
-//    private String accessKey;
-//    @Value("${cloud.aws.credentials.secretKey}")
-//    private String secretKey;
+//    private final JdbcTemplate jdbcTemplate;
 //
-//    @Bean
-//    CommandLineRunner initData(
-//            TagNameService tagNameService,
-//            MemberService memberService,
-//            MainCategoryService mainCategoryService,
-//            SubCategoryService subCategoryService,
-//            RecommendService recommendService,
-//            BrandService brandService,
-//            ProductService productService,
-//            ViewService viewService,
-//            ProductRepository productRepository,
-//            ReviewRepository reviewRepository,
-//            CouponRepository couponRepository,
-//            StoreRepository storeRepository
-//    ) {
+//    @PostConstruct
+//    public void init() {
+//        jdbcTemplate.batchUpdate()
+//
 //        return new CommandLineRunner() {
 //            @Override
 //            @Transactional

@@ -23,13 +23,13 @@ public class Product extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "product_code", nullable = false, unique = true, updatable = false   )
+    @Column(name = "product_code", nullable = false, unique = true, updatable = false)
     private String productCode;
 
-    @Column(name = "title", nullable = false)
+    @Column(nullable = false)
     private String title;
 
-    @Column(name = "description", nullable = false)
+    @Column(nullable = false)
     private String description;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
@@ -40,9 +40,6 @@ public class Product extends BaseTimeEntity {
 
     private int reviewCount = 0;
     private double rateAvg = 0;
-
-    private int saleCount = 0;
-    private int askCount = 0;
 
     private double discountRate;
     private int discountedPrice;

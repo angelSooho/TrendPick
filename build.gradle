@@ -71,7 +71,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.session:spring-session-core'
     implementation 'org.springframework.session:spring-session-data-redis'
-    implementation 'org.redisson:redisson-spring-boot-starter'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.27.1'
 
     // Kafka
     implementation 'org.springframework.kafka:spring-kafka'
@@ -85,6 +85,8 @@ dependencies {
     // Batch
     implementation 'org.springframework.boot:spring-boot-starter-batch'
     testImplementation 'org.springframework.batch:spring-batch-test'
+
+    implementation 'org.json:json:20240303'
 }
 
 tasks.named('test') {

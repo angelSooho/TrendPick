@@ -21,6 +21,6 @@ public enum MemberRole {
     public static MemberRole isType(String value) {
         return Stream.of(MemberRole.values())
                 .filter(v -> v.getValue().equals(value))
-                .findFirst().orElseThrow(() -> new BaseException(ErrorCode.NOT_MATCH));
+                .findFirst().orElseThrow(() -> new BaseException(ErrorCode.NOT_MATCH, "존재하지 않는 권한입니다."));
     }
 }

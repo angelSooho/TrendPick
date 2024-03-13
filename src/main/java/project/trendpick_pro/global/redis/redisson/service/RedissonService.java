@@ -6,7 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
-import project.trendpick_pro.global.redis.exception.RedisLockException;
+import project.trendpick_pro.domain.orders.service.OrderService;
+import project.trendpick_pro.global.exception.BaseException;
+import project.trendpick_pro.global.exception.ErrorCode;
 
 import java.util.concurrent.TimeUnit;
 
@@ -34,7 +36,7 @@ public class RedissonService {
                 }
             }
         } else {
-            throw new RedisLockException("해당 락이 사용중입니다");
+            throw new BaseException(ErrorCode.BAD_REQUEST, "주문 처리 중입니다. 잠시 후 다시 시도해주세요.");
         }
     }
 

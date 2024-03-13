@@ -1,4 +1,4 @@
 package project.trendpick_pro.global.exception;
 
-public record ErrorResponse(String code, String message) {
+public record ErrorResponse(int code, String message) {
 }

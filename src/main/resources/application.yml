@@ -33,6 +33,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+  main:
+    lazy-initialization: true
   data:
     redis:
       host: ${redis.devHost}

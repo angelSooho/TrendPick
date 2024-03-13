@@ -6,13 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 import project.trendpick_pro.domain.coupon.entity.Coupon;
 import project.trendpick_pro.domain.coupon.entity.CouponCard;
 import project.trendpick_pro.domain.coupon.entity.dto.response.CouponCardByApplyResponse;
-import project.trendpick_pro.domain.coupon.exception.CouponNotFoundException;
 import project.trendpick_pro.domain.coupon.repository.CouponCardRepository;
 import project.trendpick_pro.domain.coupon.repository.CouponRepository;
 import project.trendpick_pro.domain.member.entity.Member;
 import project.trendpick_pro.domain.member.service.MemberService;
 import project.trendpick_pro.domain.orders.entity.OrderItem;
-import project.trendpick_pro.domain.orders.exception.OrderItemNotFoundException;
 import project.trendpick_pro.domain.orders.repository.OrderItemRepository;
 import project.trendpick_pro.global.exception.BaseException;
 import project.trendpick_pro.global.exception.ErrorCode;
@@ -35,7 +33,7 @@ public class CouponCardService {
     public void issue(String email, Long couponId, LocalDateTime dateTime) {
         Member member = memberService.findByEmail(email);
         Coupon coupon = couponRepository.findById(couponId).orElseThrow(
-                () -> new CouponNotFoundException("존재하지 않는 쿠폰입니다."));
+                () -> new BaseException(ErrorCode.NOT_FOUND, "존재하지 않은 쿠폰입니다."));
         int count = couponCardRepository.countByCouponIdAndMemberId(couponId, member.getId());
 
         validateCouponCard(count, coupon);
@@ -45,9 +43,9 @@ public class CouponCardService {
     @Transactional
     public void apply(Long couponCardId, Long orderItemId) {
         OrderItem orderItem = orderItemRepository.findById(orderItemId).orElseThrow(
-                () -> new OrderItemNotFoundException("주문되지 않은 상품입니다."));
+                () -> new BaseException(ErrorCode.BAD_REQUEST, "주문되지 않은 상품입니다."));
         CouponCard couponCard = couponCardRepository.findById(couponCardId).orElseThrow(
-                () -> new CouponNotFoundException("존재하지 않은 쿠폰입니다."));
+                () -> new BaseException(ErrorCode.NOT_FOUND, "존재하지 않은 쿠폰입니다."));
         if (!couponCard.validate(orderItem, LocalDateTime.now()))
             throw new BaseException(ErrorCode.BAD_REQUEST, "쿠폰이 적용되지 않습니다.");
         couponCard.use(orderItem, LocalDateTime.now());
@@ -56,13 +54,13 @@ public class CouponCardService {
     @Transactional
     public void cancel(Long orderItemId) {
         OrderItem orderItem = orderItemRepository.findById(orderItemId).orElseThrow(
-                () -> new OrderItemNotFoundException("주문되지 않은 상품입니다."));
+                () -> new BaseException(ErrorCode.BAD_REQUEST, "주문되지 않은 상품입니다."));
         orderItem.getCouponCard().cancel(orderItem);
     }
 
     public List<CouponCardByApplyResponse> getCouponsByOrdered(Long orderItemId) {
         OrderItem orderItem = orderItemRepository.findById(orderItemId).orElseThrow(
-                () -> new OrderItemNotFoundException("주문되지 않은 상품입니다."));
+                () -> new BaseException(ErrorCode.BAD_REQUEST, "주문되지 않은 상품입니다."));
         List<CouponCard> couponCards = couponCardRepository.findAllByBrand(orderItem.getProduct().getProductOption().getBrand().getName());
         return createCouponCardByApplyResponseList(couponCards, orderItem);
     }

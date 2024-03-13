@@ -9,18 +9,19 @@
 //import org.mockito.Mock;
 //import org.mockito.junit.jupiter.MockitoExtension;
 //import project.trendpick_pro.domain.cash.entity.CashLog;
+//import project.trendpick_pro.domain.cash.service.CashService;
 //import project.trendpick_pro.domain.member.entity.Member;
-//import project.trendpick_pro.domain.member.entity.MemberRoleType;
 //import project.trendpick_pro.domain.member.service.MemberService;
+//import project.trendpick_pro.domain.store.service.StoreService;
 //import project.trendpick_pro.domain.withdraw.entity.WithdrawApply;
 //import project.trendpick_pro.domain.withdraw.entity.dto.WithDrawApplyForm;
 //import project.trendpick_pro.domain.withdraw.repository.WithdrawApplyRepository;
 //import project.trendpick_pro.domain.withdraw.service.WithdrawService;
-//import project.trendpick_pro.global.util.rsData.RsData;
 //
 //import java.util.Optional;
 //
-//import static org.mockito.ArgumentMatchers.*;
+//import static org.mockito.ArgumentMatchers.anyLong;
+//import static org.mockito.ArgumentMatchers.eq;
 //import static org.mockito.BDDMockito.given;
 //import static org.mockito.Mockito.mock;
 //

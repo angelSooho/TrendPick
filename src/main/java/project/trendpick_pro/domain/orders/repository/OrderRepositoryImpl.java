@@ -32,8 +32,6 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
     public Page<OrderResponse> findAllByMember(OrderSearchCond orderSearchCond, Pageable pageable) {
         List<OrderResponse> result = queryFactory
                 .select(new QOrderResponse(
-                        order.id,
-                        product.id,
                         product.productOption.file.fileName,
                         product.productOption.brand.name,
                         product.title,
@@ -75,8 +73,6 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
     public List<OrderResponse> findOrderItemsByOrderId(Long orderId) {
         return queryFactory
                 .select(new QOrderResponse(
-                        order.id,
-                        product.id,
                         product.productOption.file.fileName,
                         product.productOption.brand.name,
                         product.title,
@@ -103,8 +99,6 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
     public Page<OrderResponse> findAllBySeller(OrderSearchCond cond, Pageable pageable) {
         List<OrderResponse> result = queryFactory
                 .select(new QOrderResponse(
-                        order.id,
-                        product.id,
                         product.productOption.file.fileName,
                         product.productOption.brand.name,
                         product.title,

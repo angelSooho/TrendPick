@@ -1,12 +1,12 @@
 package project.trendpick_pro.global.crypto.jwt;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@Getter
+@Data
 @ConfigurationProperties(prefix = "jwt")
-@RequiredArgsConstructor
 public class JwtProperties {
 
     private String secret;
