@@ -97,7 +97,6 @@ public class BaseData implements
             resultTime /= 60;
             log.info("{}: {} min", taskName, resultTime);
         } else {
-            resultTime = (endTime - startTime) / 1000.0;
             log.info("{}: {} sec", taskName, resultTime);
         }
     }
