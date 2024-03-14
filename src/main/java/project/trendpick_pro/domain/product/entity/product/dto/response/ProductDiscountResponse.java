@@ -28,7 +28,7 @@ public class ProductDiscountResponse {
     public static ProductDiscountResponse of (Product product) {
         return ProductDiscountResponse.builder()
                 .discountRate(product.getDiscountRate())
-                .discountedPrice(product.getDiscountedPrice())
+                .discountedPrice(product.getProductOption().getPrice() - (int) (product.getProductOption().getPrice() * (product.getDiscountRate() / 100)))
                 .price(product.getProductOption().getPrice())
                 .build();
     }

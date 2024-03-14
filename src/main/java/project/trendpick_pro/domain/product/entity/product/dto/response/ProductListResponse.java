@@ -34,24 +34,14 @@ public class ProductListResponse implements Serializable {
     }
 
     public static ProductListResponse of(Product product) {
-        if (product.getDiscountedPrice() == 0 && product.getDiscountRate() == 0) {
-            return ProductListResponse.builder()
-                    .id(product.getId())
-                    .name(product.getTitle())
-                    .brand(product.getProductOption().getBrand().getName())
-                    .mainFile(product.getProductOption().getFile().getFileName())
-                    .price(product.getProductOption().getPrice())
-                    .build();
-        } else {
-            return ProductListResponse.builder()
-                    .id(product.getId())
-                    .name(product.getTitle())
-                    .brand(product.getProductOption().getBrand().getName())
-                    .mainFile(product.getProductOption().getFile().getFileName())
-                    .price(product.getProductOption().getPrice())
-                    .discountedPrice(product.getDiscountedPrice())
-                    .discountRate(product.getDiscountRate())
-                    .build();
-        }
+        return ProductListResponse.builder()
+                .id(product.getId())
+                .name(product.getTitle())
+                .brand(product.getProductOption().getBrand().getName())
+                .mainFile(product.getProductOption().getFile().getFileName())
+                .price(product.getProductOption().getPrice())
+                .discountedPrice(product.getProductOption().getPrice() - (int) (product.getProductOption().getPrice() * (product.getDiscountRate() / 100)))
+                .discountRate(product.getDiscountRate())
+                .build();
     }
 }

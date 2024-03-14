@@ -52,7 +52,7 @@ public class ReviewService {
         }
 
         Review review = Review.of(reviewSaveRequest, member, product, mainFile);
-        product.addReview(review.getRating()); //상품 리뷰수, 상품 평균 평점을 계산해서 저장
+        product.addReview();
         reviewRepository.save(review);
         return ReviewResponse.of(review);
     }

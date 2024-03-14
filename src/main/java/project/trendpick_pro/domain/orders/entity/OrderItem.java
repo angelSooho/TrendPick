@@ -81,7 +81,7 @@ public class OrderItem extends BaseTimeEntity {
 
     private OrderItem(Product product, int quantity, String size, String color) {
         this.product = product;
-        this.orderPrice = (product.getDiscountedPrice() > 0) ? product.getDiscountedPrice() : product.getProductOption().getPrice();
+        this.orderPrice = product.getProductOption().getPrice() - (int) (product.getProductOption().getPrice() * (product.getDiscountRate() / 100));
         this.quantity = quantity;
         this.size = size;
         this.color = color;

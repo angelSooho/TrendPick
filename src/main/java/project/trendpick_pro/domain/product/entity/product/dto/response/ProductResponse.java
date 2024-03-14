@@ -61,43 +61,24 @@ public class ProductResponse implements Serializable {
     }
 
     public static ProductResponse of (Product product, Page<ReviewProductResponse> reviewResponse, Page<AskResponse> askResponse) {
-        if (product.getDiscountedPrice() == 0 && product.getDiscountRate() == 0) {
-            return ProductResponse.builder()
-                    .productCode(product.getProductCode())
-                    .name(product.getTitle())
-                    .mainCategory(product.getProductOption().getMainCategory().getName())
-                    .subCategory(product.getProductOption().getSubCategory().getName())
-                    .brand(product.getProductOption().getBrand().getName())
-                    .description(product.getDescription())
-                    .mainFile(product.getProductOption().getFile().getFileName())
-                    .subFiles(subFiles(product.getProductOption().getFile().getChild()))
-                    .sizes(product.getProductOption().getSizes().stream().map(String::valueOf).toList())
-                    .colors(product.getProductOption().getColors().stream().map(String::valueOf).toList())
-                    .price(product.getProductOption().getPrice())
-                    .tags(product.getTags().stream().map(Tag::getName).toList())
-                    .reviewResponse(reviewResponse)
-                    .askResponse(askResponse)
-                    .build();
-        } else {
-            return ProductResponse.builder()
-                    .productCode(product.getProductCode())
-                    .name(product.getTitle())
-                    .mainCategory(product.getProductOption().getMainCategory().getName())
-                    .subCategory(product.getProductOption().getSubCategory().getName())
-                    .brand(product.getProductOption().getBrand().getName())
-                    .description(product.getDescription())
-                    .mainFile(product.getProductOption().getFile().getFileName())
-                    .subFiles(subFiles(product.getProductOption().getFile().getChild()))
-                    .sizes(product.getProductOption().getSizes().stream().map(String::valueOf).toList())
-                    .colors(product.getProductOption().getColors().stream().map(String::valueOf).toList())
-                    .price(product.getProductOption().getPrice())
-                    .tags(product.getTags().stream().map(Tag::getName).toList())
-                    .discountedPrice(product.getDiscountedPrice())
-                    .discountRate(product.getDiscountRate())
-                    .reviewResponse(reviewResponse)
-                    .askResponse(askResponse)
-                    .build();
-        }
+        return ProductResponse.builder()
+                .productCode(product.getProductCode())
+                .name(product.getTitle())
+                .mainCategory(product.getProductOption().getMainCategory().getName())
+                .subCategory(product.getProductOption().getSubCategory().getName())
+                .brand(product.getProductOption().getBrand().getName())
+                .description(product.getDescription())
+                .mainFile(product.getProductOption().getFile().getFileName())
+                .subFiles(subFiles(product.getProductOption().getFile().getChild()))
+                .sizes(product.getProductOption().getSizes().stream().map(String::valueOf).toList())
+                .colors(product.getProductOption().getColors().stream().map(String::valueOf).toList())
+                .price(product.getProductOption().getPrice())
+                .tags(product.getTags().stream().map(Tag::getName).toList())
+                .discountedPrice(product.getProductOption().getPrice() - (int) (product.getProductOption().getPrice() * product.getDiscountRate()))
+                .discountRate(product.getDiscountRate())
+                .reviewResponse(reviewResponse)
+                .askResponse(askResponse)
+                .build();
     }
 
     private static List<String> subFiles(List<CommonFile> subFiles) {

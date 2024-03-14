@@ -23,7 +23,7 @@ public class Product extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "product_code", nullable = false, unique = true, updatable = false)
+    @Column(name = "product_code", nullable = false, updatable = false)
     private String productCode;
 
     @Column(nullable = false)
@@ -40,10 +40,8 @@ public class Product extends BaseTimeEntity {
     private ProductOption productOption;
 
     private int reviewCount = 0;
-    private double rateAvg = 0;
 
     private double discountRate;
-    private int discountedPrice;
 
     @Builder
     private Product(String productCode, String title, String description) {
@@ -54,7 +52,7 @@ public class Product extends BaseTimeEntity {
 
     public static Product of(String title, String description) {
         return Product.builder()
-                .productCode("P" + UUID.randomUUID().toString())
+                .productCode("P" + UUID.randomUUID())
                 .title(title)
                 .description(description)
                 .build();
@@ -70,20 +68,12 @@ public class Product extends BaseTimeEntity {
         this.productOption.update(optionSaveRequest);
     }
 
-    public void addReview(int rating){
-        double total = getRateAvg() * getReviewCount() + rating;
+    public void addReview(){
         this.reviewCount++;
-        this.rateAvg = Math.round(total / reviewCount * 10) / 10.0;
     }
 
     public void applyDiscount(double discountRate) {
-        if (discountRate == 0) {
-            this.discountRate = 0;
-            this.discountedPrice = 0;
-        } else {
-            this.discountRate = discountRate;
-            this.discountedPrice = (int) (this.productOption.getPrice() * (1 - discountRate / 100));
-        }
+        this.discountRate = discountRate;
     }
 
     public void updateTags(Set<Tag> tags){

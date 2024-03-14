@@ -12,30 +12,17 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import project.trendpick_pro.domain.brand.entity.Brand;
 import project.trendpick_pro.domain.category.entity.MainCategory;
-import project.trendpick_pro.domain.category.entity.SubCategory;
-import project.trendpick_pro.domain.category.service.MainCategoryService;
-import project.trendpick_pro.domain.category.service.SubCategoryService;
 import project.trendpick_pro.domain.common.file.CommonFile;
 import project.trendpick_pro.domain.member.entity.Member;
 import project.trendpick_pro.domain.member.entity.MemberRole;
 import project.trendpick_pro.domain.member.entity.SocialProvider;
-import project.trendpick_pro.domain.product.entity.product.Product;
-import project.trendpick_pro.domain.product.entity.product.ProductStatus;
-import project.trendpick_pro.domain.product.entity.productOption.ProductOption;
-import project.trendpick_pro.domain.tags.tag.entity.Tag;
-import project.trendpick_pro.global.basedata.tagname.entity.TagName;
 import project.trendpick_pro.global.config.AmazonProperties;
 import project.trendpick_pro.global.config.DataProperties;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -50,11 +37,15 @@ public class BaseData implements
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final MainCategoryService mainCategoryService;
-    private final SubCategoryService subCategoryService;
+    private final Random random = new Random();
+
+    private static final int THREAD_COUNT = 10;
+    private static final int MEMBER_COUNT = 500;
+    private static final int FILE_COUNT = 100;
+    private static final int PRODUCT_COUNT = 10_000_000;
+    private static final int BATCH_SIZE = 10_000;
 
     @Override public void onApplicationEvent(ContextRefreshedEvent event) {
-        long startTime = System.currentTimeMillis();
         Map<String, List<String>> categories = new HashMap<>();
         categories.put("상의", dataProperties.getTop());
         categories.put("하의", dataProperties.getBottom());
@@ -63,25 +54,30 @@ public class BaseData implements
         categories.put("가방", dataProperties.getBag());
         categories.put("액세서리", dataProperties.getAccessory());
 
-        int memberCount = 100;
-        int fileCount = 100;
-        int productCount = 10_000_000;
+        saveMembersBulk(MEMBER_COUNT);
+        makeBrandMembersBulk(dataProperties.getBrand());
+        saveMainCategoriesBulk(dataProperties.getMainCategory());
+        saveSubCategoriesBulk(categories);
+        saveFilesBulk(FILE_COUNT);
 
-        executionTime("member insert", () -> saveMembersBulk(memberCount));
-        executionTime("brandMember insert", () -> makeBrandMembersBulk(dataProperties.getBrand()));
-        executionTime("mainCategory insert", () -> saveMainCategoriesBulk(dataProperties.getMainCategory()));
-        executionTime("subCategory insert", () -> saveSubCategoriesBulk(categories));
-        executionTime("file insert", () -> saveFilesBulk(fileCount));
-            executionTime("productOption insert", () -> {
-                try {
-                    saveProductOptionsBulk(productCount, fileCount);
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
+        executionTime("productOption insert", () -> {
+            try {
+                for (int i = 1; i <= PRODUCT_COUNT; i++) {
+                    if (i % BATCH_SIZE == 0) {
+                        saveProductOptionsBulk();
+                    }
                 }
-            });
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         executionTime("product insert", () -> {
             try {
-                saveProductsBulk(productCount);
+                for (int i = 1; i <= PRODUCT_COUNT; i++) {
+                    if (i % BATCH_SIZE == 0) {
+                        saveProductsBulk();
+                    }
+                }
             } catch (InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
@@ -94,9 +90,9 @@ public class BaseData implements
         long endTime = System.currentTimeMillis();
         double resultTime = (endTime - startTime) / 1000.0;
         if (resultTime > 60) {
-            log.info("{}: {} min {} sec", taskName, (int) (resultTime / 60), (int) (resultTime % 60));
+            log.info("{}: {}min {}sec", taskName, (int) (resultTime / 60), (int) (resultTime % 60));
         } else {
-            log.info("{}: {} sec", taskName, resultTime);
+            log.info("{}: {}sec", taskName, resultTime);
         }
     }
 
@@ -157,6 +153,17 @@ public class BaseData implements
             members.add(member);
         }
 
+        jdbcTemplate.batchUpdate("INSERT INTO brand (name) VALUES (?)", new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setString(1, brandNames.get(i));
+            }
+
+            @Override
+            public int getBatchSize() {
+                return brandNames.size();
+            }
+        });
         String sql = "INSERT INTO member (email, nick_name, phone_number, provider, role, brand) VALUES (?, ?, ?, ?, ?, ?)";
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
@@ -214,110 +221,23 @@ public class BaseData implements
         });
     }
 
-    public void saveProductsBulk(int count) throws InterruptedException {
-        ExecutorService executor = Executors.newFixedThreadPool(10);
-        List<Product> products = new CopyOnWriteArrayList<>();
-        for (int n = 1; n <= count; n++) {
-            int currentN = n;
-            executor.execute(() -> {
-                Product product = Product
-                        .builder()
-                        .productCode("P" + UUID.randomUUID())
-                        .title(currentN + " title 멋사입니다. ")
-                        .description(currentN + " description 멋사입니다. ")
-                        .build();
-                Set<Tag> tags = new LinkedHashSet<>();
-                for (int i = 0; i <= 4; i++) {
-                    Tag tag = new Tag(new TagName("tag" + i).getName());
-                    tags.add(tag);
-                }
-                product.updateTags(tags);
-                products.add(product);
-            });
-        }
-
-        executor.shutdown();
-        if (!executor.awaitTermination(1L, TimeUnit.HOURS)) {
-            executor.shutdownNow();
-        }
-
-        String sql = "INSERT INTO product (product_code, title, description, product_option_id, review_count, rate_avg, discount_rate, discounted_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement ps, int i) throws SQLException {
-                Product product = products.get(i);
-                ps.setString(1, product.getProductCode());
-                ps.setString(2, product.getTitle());
-                ps.setString(3, product.getDescription());
-                ps.setLong(4, 5);
-                ps.setInt(5, 23);
-                ps.setDouble(6, 1);
-                ps.setDouble(7, 1);
-                ps.setInt(8, 29000);
-            }
-
-            @Override
-            public int getBatchSize() {
-                return products.size();
-            }
-        });
-    }
-
-    public void saveProductOptionsBulk(int count, int fileCount) throws InterruptedException {
-        ExecutorService executor = Executors.newFixedThreadPool(10);
-        List<ProductOption> productOptions = new CopyOnWriteArrayList<>();
-        MainCategory mainCategory = mainCategoryService.findByName(dataProperties.getMainCategory().get((int) (Math.random() * 5)));
-        SubCategory subCategory = subCategoryService.findByName(dataProperties.getBottom().get((int) (Math.random() * 5)));
-        for (int i = 0; i < count; i++) {
-            executor.submit(() -> {
-                int stockRandom = 123;
-                int priceRandom = 25000;
-
-                List<String> colors = dataProperties.getColors();
-                List<String> selectedColors = colors.subList(0, colors.size());
-                List<String> inputSizes = new ArrayList<>(dataProperties.getSizes().getTops());
-
-                ProductOption productOption = ProductOption.of(inputSizes, selectedColors, stockRandom, priceRandom);
-                Brand brand = new Brand(dataProperties.getBrand().get((int) (Math.random() * dataProperties.getBrand().size())));
-                productOption.settingConnection(brand, mainCategory, subCategory, null, ProductStatus.SALE);
-                productOptions.add(productOption);
-            });
-        }
-
-        executor.shutdown();
-        if (!executor.awaitTermination(1L, TimeUnit.HOURS)) {
-            executor.shutdownNow();
-        }
-
-        jdbcTemplate.batchUpdate("INSERT INTO brand (name) VALUES (?)", new BatchPreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement ps, int i) throws SQLException {
-                ps.setString(1, "멋사");
-            }
-
-            @Override
-            public int getBatchSize() {
-                return 1;
-            }
-        });
-
+    private void saveProductOptionsBulk() throws InterruptedException {
         String sql = "INSERT INTO product_option (stock, price, status, common_file_id, main_category_id, sub_category_id, brand_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
-                ProductOption productOption = productOptions.get(i);
-                ps.setInt(1, productOption.getStock());
-                ps.setInt(2, productOption.getPrice());
-                ps.setString(3, productOption.getStatus().getText());
-                ps.setLong(4, 5);
-                ps.setLong(5, 1);
-                ps.setLong(6, 1);
-                ps.setLong(7, 1);
+                ps.setInt(1, (int) (Math.random() * 200)+ 100);
+                ps.setInt(2, (int) (Math.random() * (250000 - 20000 + 1)) + 10000);
+                ps.setString(3, "SALE");
+                ps.setLong(4, (int) (Math.random() * FILE_COUNT) + 1);
+                ps.setLong(5, (int) (Math.random() * 5) + 1);
+                ps.setLong(6, (int) (Math.random() * 5) + 1);
+                ps.setLong(7, (int) (Math.random() * 5) + 1);
             }
 
             @Override
             public int getBatchSize() {
-                return productOptions.size();
+                return BATCH_SIZE;
             }
         });
 
@@ -327,7 +247,7 @@ public class BaseData implements
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 ps.setString(1, dataProperties.getSizes().getTops().get(i));
-                ps.setLong(2, 1);
+                ps.setLong(2, i+1);
             }
 
             @Override
@@ -349,7 +269,27 @@ public class BaseData implements
         });
     }
 
-    public void saveFilesBulk(int count) {
+    private void saveProductsBulk() throws InterruptedException {
+        String sql = "INSERT INTO product (product_code, title, description, product_option_id, review_count, discount_rate) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setString(1, "P" + UUID.randomUUID());
+                ps.setString(2, "title");
+                ps.setString(3, "description");
+                ps.setLong(4, (int) (Math.random() * 1000) + 1);
+                ps.setInt(5, 0);
+                ps.setDouble(6, 0.5);
+            }
+
+            @Override
+            public int getBatchSize() {
+                return BATCH_SIZE;
+            }
+        });
+    }
+
+    private void saveFilesBulk(int count) {
         List<CommonFile> commonFiles = new ArrayList<>();
         for (int idx = 0; idx < count; idx++) {
             List<String> filenames = listS3ObjectKeys(amazonS3Client, amazonProperties.getS3().getBucket());

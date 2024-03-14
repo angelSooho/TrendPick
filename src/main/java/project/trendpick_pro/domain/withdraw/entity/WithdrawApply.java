@@ -14,27 +14,26 @@ import static jakarta.persistence.FetchType.LAZY;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WithdrawApply {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    private Member applicant;
+    private Member member;
 
     private String bankName;
     private String bankAccountNo;
     private int price;
 
     @ManyToOne(fetch = LAZY)
-    @ToString.Exclude
     private CashLog withdrawCashLog; // 출금에 관련된 내역
+
     private LocalDateTime withdrawDate;
     private LocalDateTime cancelDate;
     private String msg;
 
     @Builder
-    public WithdrawApply(Member applicant, String bankName, String bankAccountNo, int price, CashLog withdrawCashLog, LocalDateTime withdrawDate, LocalDateTime cancelDate, String msg) {
-        this.applicant = applicant;
+    public WithdrawApply(Member member, String bankName, String bankAccountNo, int price, CashLog withdrawCashLog, LocalDateTime withdrawDate, LocalDateTime cancelDate, String msg) {
+        this.member = member;
         this.bankName = bankName;
         this.bankAccountNo = bankAccountNo;
         this.price = price;
@@ -44,12 +43,12 @@ public class WithdrawApply {
         this.msg = msg;
     }
 
-    static public WithdrawApply of(WithDrawApplyForm withDrawApplyForm, Member applicant){
+    static public WithdrawApply of(WithDrawApplyForm withDrawApplyForm, Member member){
         return WithdrawApply.builder()
                 .bankName(withDrawApplyForm.getBankName())
                 .bankAccountNo(withDrawApplyForm.getBankAccountNo())
                 .price(withDrawApplyForm.getPrice())
-                .applicant(applicant)
+                .member(member)
                 .build();
     }
 
@@ -61,7 +60,6 @@ public class WithdrawApply {
         withdrawDate = LocalDateTime.now();
         this.withdrawCashLog = cashLog;
         this.msg = msg;
-
     }
 
     public void setCancelDone(String msg) {

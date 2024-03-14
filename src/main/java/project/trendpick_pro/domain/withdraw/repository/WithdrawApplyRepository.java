@@ -9,9 +9,9 @@ import java.util.List;
 
 
 public interface WithdrawApplyRepository extends JpaRepository<WithdrawApply, Long> {
-    @Query("select w from WithdrawApply w where w.applicant.id = :id")
+    @Query("select w from WithdrawApply w where w.member.id = :id")
     List<WithdrawApply> findAllByApplicantId(@Param("id") Long id);
 
-    @Query("select w from WithdrawApply w where w.applicant.brand = :storeName")
+    @Query("select w from WithdrawApply w where w.member.brand = :storeName")
     List<WithdrawApply> findWithdrawsByStoreName(@Param("storeName") String storeName);
 }

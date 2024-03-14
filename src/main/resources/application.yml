@@ -32,7 +32,7 @@ spring:
       on-profile: local
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_HOST:localhost}:3306/trendpick
+    url: jdbc:mysql://${DB_HOST:localhost}:3306/trendpick?rewriteBatchedStatements=true
     username: trendpick.application
     password: admin
   h2:
@@ -41,7 +41,7 @@ spring:
       path: /h2-console
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create
   main:
     lazy-initialization: true
   data:

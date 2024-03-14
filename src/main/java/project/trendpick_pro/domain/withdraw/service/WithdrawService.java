@@ -29,7 +29,7 @@ public class WithdrawService {
                 .bankName(bankName)
                 .bankAccountNo(bankAccountNo)
                 .price(price)
-                .applicant(applicant)
+                .member(applicant)
                 .build();
         withdrawApplyRepository.save(withdrawApply);
         return withdrawApply;
