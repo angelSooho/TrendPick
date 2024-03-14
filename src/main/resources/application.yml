@@ -54,10 +54,6 @@ spring:
   redis:
     host: ${redis.devHost}
     port: ${redis.devPort}
-#
-#kafka:
-#  host: "localhost:"
-#  port: ${custom.kafka.devPort}
 
 ---
 
