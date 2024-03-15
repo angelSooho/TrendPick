@@ -9,7 +9,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import project.trendpick_pro.domain.product.entity.product.dto.request.ProductSearchCond;
-import project.trendpick_pro.domain.product.entity.product.dto.response.*;
+import project.trendpick_pro.domain.product.entity.product.dto.response.ProductByRecommended;
+import project.trendpick_pro.domain.product.entity.product.dto.response.ProductListResponse;
+import project.trendpick_pro.domain.product.entity.product.dto.response.QProductByRecommended;
+import project.trendpick_pro.domain.product.entity.product.dto.response.QProductListResponse;
 
 import java.util.List;
 
@@ -39,10 +42,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         brand.name,
                         commonFile.fileName,
                         productOption.price,
-                        product.discountRate,
-                        product.discountedPrice
-                        )
-                )
+                        product.discountRate
+                ))
                 .from(product)
                 .leftJoin(product.productOption, productOption)
                 .leftJoin(productOption.mainCategory, mainCategory)
@@ -100,8 +101,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         brand.name,
                         commonFile.fileName,
                         productOption.price,
-                        product.discountRate,
-                        product.discountedPrice
+                        product.discountRate
                         )
                 )
                 .from(product)

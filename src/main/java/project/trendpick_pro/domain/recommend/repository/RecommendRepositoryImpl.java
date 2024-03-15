@@ -34,8 +34,7 @@ public class RecommendRepositoryImpl implements RecommendRepositoryCustom {
                         product.productOption.brand.name,
                         product.productOption.file.fileName,
                         productOption.price,
-                        product.discountRate,
-                        product.discountedPrice
+                        product.discountRate
                 ))
                 .from(recommend)
                 .leftJoin(recommend.member, member)

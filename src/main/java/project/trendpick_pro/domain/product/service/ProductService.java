@@ -8,8 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import project.trendpick_pro.domain.ask.entity.dto.response.AskResponse;
-import project.trendpick_pro.domain.ask.service.AskService;
 import project.trendpick_pro.domain.brand.entity.Brand;
 import project.trendpick_pro.domain.brand.service.BrandService;
 import project.trendpick_pro.domain.category.entity.MainCategory;
@@ -32,8 +30,6 @@ import project.trendpick_pro.domain.product.entity.product.dto.response.ProductR
 import project.trendpick_pro.domain.product.entity.productOption.ProductOption;
 import project.trendpick_pro.domain.product.entity.productOption.dto.ProductOptionSaveRequest;
 import project.trendpick_pro.domain.product.repository.ProductRepository;
-import project.trendpick_pro.domain.review.entity.dto.response.ReviewProductResponse;
-import project.trendpick_pro.domain.review.service.ReviewService;
 import project.trendpick_pro.domain.tags.favoritetag.entity.FavoriteTag;
 import project.trendpick_pro.domain.tags.favoritetag.service.FavoriteTagService;
 import project.trendpick_pro.domain.tags.tag.entity.Tag;
@@ -57,13 +53,10 @@ public class ProductService {
     private final MainCategoryService mainCategoryService;
     private final SubCategoryService subCategoryService;
     private final BrandService brandService;
-    private final ReviewService reviewService;
-    private final AskService askService;
-
-    private final FileTranslator fileTranslator;
     private final FavoriteTagService favoriteTagService;
     private final TagService tagService;
 
+    private final FileTranslator fileTranslator;
     private final AmazonS3Client amazonS3;
     private final AmazonProperties amazonProperties;
 
@@ -121,15 +114,9 @@ public class ProductService {
         productRepository.delete(product);
     }
 
-    public ProductResponse getProduct(String email, Long productId, Pageable pageable) {
-        Member member = memberService.findByEmail(email);
+    public ProductResponse getProduct(Long productId) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND, "존재하지 않는 상품입니다."));
-        if (member.getRole().equals(MemberRole.MEMBER)) {
-            favoriteTagService.updateTag(member, product, TagType.SHOW);
-        }
-        Page<ReviewProductResponse> reviews = reviewService.getReviewsByProduct(productId, pageable);
-        Page<AskResponse> asks = askService.findAsksByProduct(productId, 0);
-        return ProductResponse.of(product, reviews, asks);
+        return ProductResponse.of(product, amazonProperties);
     }
 
     public Page<ProductListResponse> getProducts(int offset, String mainCategory, String subCategory) {
@@ -138,8 +125,8 @@ public class ProductService {
         return productRepository.findAllByCategoryId(cond, pageable);
     }
 
-    public Page<ProductListResponse> findAllByKeyword(String keyword, int offset) {
-        ProductSearchCond cond = new ProductSearchCond(keyword);
+    public Page<ProductListResponse> findAllByKeyword(String query, int offset) {
+        ProductSearchCond cond = new ProductSearchCond(query);
         PageRequest pageable = PageRequest.of(offset, 18);
         return productRepository.findAllByKeyword(cond, pageable);
     }

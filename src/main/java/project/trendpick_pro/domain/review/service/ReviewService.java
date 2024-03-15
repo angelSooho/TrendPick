@@ -2,7 +2,6 @@ package project.trendpick_pro.domain.review.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +23,6 @@ import project.trendpick_pro.global.config.AmazonProperties;
 
 import java.util.List;
 
-@Lazy
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

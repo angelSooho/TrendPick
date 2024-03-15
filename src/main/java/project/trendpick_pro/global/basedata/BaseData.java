@@ -22,11 +22,13 @@ import project.trendpick_pro.global.config.DataProperties;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Slf4j
 @Component
-@Profile({"local"})
+@Profile({"test"})
 @RequiredArgsConstructor
 public class BaseData implements
         ApplicationListener<ContextRefreshedEvent> {
@@ -43,7 +45,8 @@ public class BaseData implements
     private static final int MEMBER_COUNT = 500;
     private static final int FILE_COUNT = 100;
     private static final int PRODUCT_COUNT = 10_000_000;
-    private static final int BATCH_SIZE = 10_000;
+    private static final int BATCH_SIZE = 5_000;
+    private static final UUID uuid = UUID.randomUUID();
 
     @Override public void onApplicationEvent(ContextRefreshedEvent event) {
         Map<String, List<String>> categories = new HashMap<>();
@@ -58,7 +61,7 @@ public class BaseData implements
         makeBrandMembersBulk(dataProperties.getBrand());
         saveMainCategoriesBulk(dataProperties.getMainCategory());
         saveSubCategoriesBulk(categories);
-        saveFilesBulk(FILE_COUNT);
+        saveFilesBulk();
 
         executionTime("productOption insert", () -> {
             try {
@@ -74,7 +77,7 @@ public class BaseData implements
         executionTime("product insert", () -> {
             try {
                 for (int i = 1; i <= PRODUCT_COUNT; i++) {
-                    if (i % BATCH_SIZE == 0) {
+                    if (i % BATCH_SIZE == 0 || i == PRODUCT_COUNT) {
                         saveProductsBulk();
                     }
                 }
@@ -89,10 +92,11 @@ public class BaseData implements
         task.run();
         long endTime = System.currentTimeMillis();
         double resultTime = (endTime - startTime) / 1000.0;
+        String dateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now());
         if (resultTime > 60) {
-            log.info("{}: {}min {}sec", taskName, (int) (resultTime / 60), (int) (resultTime % 60));
+            log.info("{}: {} min {} sec. / {}", taskName, (int) (resultTime / 60), (int) (resultTime % 60), dateTime);
         } else {
-            log.info("{}: {}sec", taskName, resultTime);
+            log.info("{}: {} sec. / {}", taskName, resultTime, dateTime);
         }
     }
 
@@ -226,13 +230,13 @@ public class BaseData implements
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
-                ps.setInt(1, (int) (Math.random() * 200)+ 100);
-                ps.setInt(2, (int) (Math.random() * (250000 - 20000 + 1)) + 10000);
+                ps.setInt(1, random.nextInt(1, 100));
+                ps.setInt(2, random.nextInt(10_000, 250_000));
                 ps.setString(3, "SALE");
-                ps.setLong(4, (int) (Math.random() * FILE_COUNT) + 1);
-                ps.setLong(5, (int) (Math.random() * 5) + 1);
-                ps.setLong(6, (int) (Math.random() * 5) + 1);
-                ps.setLong(7, (int) (Math.random() * 5) + 1);
+                ps.setLong(4, random.nextInt(1, FILE_COUNT));
+                ps.setLong(5, random.nextInt(1, 5));
+                ps.setLong(6, random.nextInt(1, 5));
+                ps.setLong(7, random.nextInt(1, 5));
             }
 
             @Override
@@ -270,28 +274,29 @@ public class BaseData implements
     }
 
     private void saveProductsBulk() throws InterruptedException {
-        String sql = "INSERT INTO product (product_code, title, description, product_option_id, review_count, discount_rate) VALUES (?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement ps, int i) throws SQLException {
-                ps.setString(1, "P" + UUID.randomUUID());
-                ps.setString(2, "title");
-                ps.setString(3, "description");
-                ps.setLong(4, (int) (Math.random() * 1000) + 1);
-                ps.setInt(5, 0);
-                ps.setDouble(6, 0.5);
-            }
+        jdbcTemplate.batchUpdate("INSERT INTO product (product_code, title, description, product_option_id, review_count, discount_rate) VALUES (?, ?, ?, ?, ?, ?)",
+                new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        ps.setString(1, "P" + uuid);
+                        ps.setString(2, dataProperties.getMainCategory().get(random.nextInt(0, dataProperties.getMainCategory().size())) +
+                                "_" + dataProperties.getBrand().get(random.nextInt(0, dataProperties.getBrand().size())) + "_수호");
+                        ps.setString(3, "description");
+                        ps.setLong(4, random.nextInt(1, 100_000));
+                        ps.setInt(5, 0);
+                        ps.setDouble(6, 0);
+                    }
 
-            @Override
-            public int getBatchSize() {
-                return BATCH_SIZE;
-            }
-        });
+                    @Override
+                    public int getBatchSize() {
+                        return BATCH_SIZE;
+                    }
+                });
     }
 
-    private void saveFilesBulk(int count) {
+    private void saveFilesBulk() {
         List<CommonFile> commonFiles = new ArrayList<>();
-        for (int idx = 0; idx < count; idx++) {
+        for (int idx = 0; idx < FILE_COUNT; idx++) {
             List<String> filenames = listS3ObjectKeys(amazonS3Client, amazonProperties.getS3().getBucket());
             CommonFile commonFile = CommonFile.builder()
                     .fileName(selectRandomFilePath(filenames))
@@ -314,7 +319,7 @@ public class BaseData implements
 
                 @Override
                 public int getBatchSize() {
-                    return count;
+                    return FILE_COUNT;
                 }
             });
     }

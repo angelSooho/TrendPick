@@ -1,18 +1,14 @@
 package project.trendpick_pro.domain.product.controller;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import project.trendpick_pro.domain.member.controller.annotation.MemberEmail;
 import project.trendpick_pro.domain.product.entity.dto.ProductRequest;
 import project.trendpick_pro.domain.product.entity.product.dto.response.ProductListResponse;
-import project.trendpick_pro.domain.product.entity.product.dto.response.ProductListResponseBySeller;
 import project.trendpick_pro.domain.product.entity.product.dto.response.ProductResponse;
 import project.trendpick_pro.domain.product.service.ProductService;
 import project.trendpick_pro.global.kafka.view.service.ViewService;
@@ -53,23 +49,22 @@ public class ProductController {
 
     @PreAuthorize("permitAll()")
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductResponse> getProduct(@MemberEmail String email, @PathVariable Long productId, Pageable pageable) {
-        return ResponseEntity.ok().body(productService.getProduct(email, productId, pageable));
+    public ResponseEntity<ProductResponse> getProduct(@PathVariable Long productId) {
+        return ResponseEntity.ok().body(productService.getProduct(productId));
     }
 
     @PreAuthorize("permitAll()")
     @GetMapping
     public ResponseEntity<Page<ProductListResponse>> showAllProduct(@RequestParam(value = "page", defaultValue = "0") int offset,
                                  @RequestParam(value = "main-category", defaultValue = "all") String mainCategory,
-                                 @RequestParam(value = "sub-category", defaultValue = "all") String subCategory, HttpSession session) {
-        viewService.requestIncrementViewCount(session);
+                                 @RequestParam(value = "sub-category", defaultValue = "all") String subCategory) {
         return ResponseEntity.ok().body(productService.getProducts(offset, mainCategory, subCategory));
     }
 
     @GetMapping("/keyword")
-    public ResponseEntity<Page<ProductListResponse>> searchQuery(@RequestParam String keyword,
+    public ResponseEntity<Page<ProductListResponse>> searchQuery(@RequestParam(value = "query") String query,
                                                                  @RequestParam(value = "page", defaultValue = "0") int offset) {
-        return ResponseEntity.ok().body(productService.findAllByKeyword(keyword, offset));
+        return ResponseEntity.ok().body(productService.findAllByKeyword(query, offset));
     }
 
     @PostMapping("/admin/discount/{productId}")

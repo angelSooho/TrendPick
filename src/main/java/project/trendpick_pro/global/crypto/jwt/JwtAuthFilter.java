@@ -34,6 +34,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
         try {
+            if (request.getRequestURI().contains("api")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
             if (request.getRequestURI().contains("login")) {
                 boolean isToken = jwtTokenUtil.checkTokenFromCookie("accessToken", request);
                 if (isToken) {

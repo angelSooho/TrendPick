@@ -13,7 +13,6 @@ import java.util.List;
 public class DataProperties {
 
     private List<String> tags;
-    @JsonProperty("main-category")
     private List<String> mainCategory;
     private List<String> outer;
     private List<String> top;

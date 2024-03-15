@@ -18,18 +18,27 @@ public class ProductListResponse implements Serializable {
     private String brand;
     private String mainFile;
     private int price;
-    private int discountRate;
+    private double discountRate;
     private int discountedPrice;
 
-    @Builder
     @QueryProjection
-    public ProductListResponse(Long id, String name, String brand, String mainFile, int price, double discountRate, int discountedPrice) {
+    public ProductListResponse(Long id, String name, String brand, String mainFile, int price, double discountRate) {
         this.id = id;
         this.name = name;
         this.brand = brand;
         this.mainFile = mainFile;
         this.price = price;
         this.discountRate = (int) discountRate;
+    }
+
+    @Builder
+    public ProductListResponse(Long id, String name, String brand, String mainFile, int price, double discountRate, int discountedPrice) {
+        this.id = id;
+        this.name = name;
+        this.brand = brand;
+        this.mainFile = mainFile;
+        this.price = price;
+        this.discountRate = discountRate;
         this.discountedPrice = discountedPrice;
     }
 
@@ -40,8 +49,8 @@ public class ProductListResponse implements Serializable {
                 .brand(product.getProductOption().getBrand().getName())
                 .mainFile(product.getProductOption().getFile().getFileName())
                 .price(product.getProductOption().getPrice())
-                .discountedPrice(product.getProductOption().getPrice() - (int) (product.getProductOption().getPrice() * (product.getDiscountRate() / 100)))
                 .discountRate(product.getDiscountRate())
+                .discountedPrice(product.getProductOption().getPrice() - (int) (product.getProductOption().getPrice() * (product.getDiscountRate() / 100)))
                 .build();
     }
 }

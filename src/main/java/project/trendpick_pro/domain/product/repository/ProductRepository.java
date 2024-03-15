@@ -8,8 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import project.trendpick_pro.domain.product.entity.product.Product;
 
-public interface ProductRepository extends JpaRepository<Product, Long>, ProductRepositoryCustom {
+import java.util.Optional;
 
+public interface ProductRepository extends JpaRepository<Product, Long>, ProductRepositoryCustom {
+    Optional<Product> findByProductCode(String productCode);
     @Modifying
     @Query("UPDATE Product p SET p.productOption.price = :newPrice WHERE p.id = :productId")
     void updatePrice(@Param("productId") Long productId, @Param("newPrice") int newPrice);

@@ -41,7 +41,7 @@ spring:
       path: /h2-console
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
   main:
     lazy-initialization: true
   data:
