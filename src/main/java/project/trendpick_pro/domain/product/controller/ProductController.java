@@ -2,6 +2,7 @@ package project.trendpick_pro.domain.product.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -62,8 +63,9 @@ public class ProductController {
     }
 
     @GetMapping("/keyword")
-    public ResponseEntity<Page<ProductListResponse>> searchQuery(@RequestParam(value = "query") String query,
-                                                                 @RequestParam(value = "page", defaultValue = "0") int offset) {
+    public ResponseEntity<Page<ProductListResponse>> searchQuery(
+            @Length(min = 2, max = 10, message = "검색어는 2자 이상 10자 이하로 입력해주세요.") @RequestParam(value = "query") String query,
+            @RequestParam(value = "page", defaultValue = "0") int offset) {
         return ResponseEntity.ok().body(productService.findAllByKeyword(query, offset));
     }
 

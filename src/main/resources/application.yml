@@ -35,6 +35,9 @@ spring:
     url: jdbc:mysql://${DB_HOST:localhost}:3306/trendpick?rewriteBatchedStatements=true
     username: trendpick.application
     password: admin
+  sql:
+    init:
+      mode: always
   h2:
     console:
       enabled: true
