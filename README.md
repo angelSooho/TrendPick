@@ -38,27 +38,19 @@
 
 ## 🛠️ 사용 기술 스택
 
-### 프론트엔드
+### Backend
 
-HTML5, CSS3, JavaScript, Thymeleaf
+Java17, Gradle, SpringBoot 3.x. Spring Data JPA, H2, Spring Security, Spring Batch, JUnit5, Mockito
 
-### 백엔드
+### Infra
 
-Java17, Gradle, SpringBoot 3.x. Spring Data JPA, MYSQL, OAuth2.0, Spring Security, Spring Data Redis, Spring Batch, Spring Kafka, JUnit5, Mockito
+NCP - Server, ObjectStorage, Nginx, Redis, Docker, Github Actions,
+Kubernates, Confluent Kafka, Pinpoint, Apache JMeter,
 
-### 테스트
 
-Apache JMeter-CLI
+### Etc
 
-### 인프라
-
-Naver Clound Platform - Server(EC2), Object Storage(S3), Cloud DB for MYSQL(RDS), 
-
-Kubernates, Docker, NGINX, Github Action, Pinpoint, Confluent Kafka
-
-### 협업 툴
-
-Git, Discord, Notion
+Git, Discord, Slack
 
 <br>
 
