@@ -11,15 +11,11 @@ import project.trendpick_pro.domain.category.entity.SubCategory;
 import project.trendpick_pro.domain.common.file.CommonFile;
 import project.trendpick_pro.domain.product.entity.product.ProductStatus;
 import project.trendpick_pro.domain.product.entity.productOption.dto.ProductOptionSaveRequest;
-import project.trendpick_pro.domain.tags.tag.entity.Tag;
 import project.trendpick_pro.global.exception.BaseException;
 import project.trendpick_pro.global.exception.ErrorCode;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import static project.trendpick_pro.domain.product.entity.product.ProductStatus.SALE;
 import static project.trendpick_pro.domain.product.entity.product.ProductStatus.SOLD_OUT;

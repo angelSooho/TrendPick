@@ -5,6 +5,7 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -28,9 +29,11 @@ import static project.trendpick_pro.domain.tags.tag.entity.QTag.tag;
 public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+    private final EntityManager em;
 
     public ProductRepositoryImpl(EntityManager em) {
         this.queryFactory = new JPAQueryFactory(em);
+        this.em = em;
     }
 
     @Override
@@ -94,48 +97,53 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     @Override
     public Page<ProductListResponse> findAllByKeyword(ProductSearchCond cond, Pageable pageable) {
-        List<ProductListResponse> result = queryFactory
-                .select(new QProductListResponse(
-                        product.id,
-                        product.title,
-                        brand.name,
-                        commonFile.fileName,
-                        productOption.price,
-                        product.discountRate
-                        )
-                )
-                .from(product)
-                .leftJoin(product.productOption, productOption)
-                .leftJoin(productOption.mainCategory, mainCategory)
-                .leftJoin(productOption.subCategory, subCategory)
-                .leftJoin(productOption.brand, brand)
-                .leftJoin(productOption.file, commonFile)
-                .where(
-                        product.title.contains(cond.getKeyword())
-                    .or(brand.name.contains(cond.getKeyword()))
-                    .or(mainCategory.name.contains(cond.getKeyword()))
-                    .or(subCategory.name.contains(cond.getKeyword()))
-                )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
 
-        JPAQuery<Long> count = queryFactory
-                .select(product.count())
-                .from(product)
-                .leftJoin(product.productOption, productOption)
-                .leftJoin(productOption.mainCategory, mainCategory)
-                .leftJoin(productOption.subCategory, subCategory)
-                .leftJoin(productOption.brand, brand)
-                .leftJoin(productOption.file, commonFile)
-                .where(
-                        product.title.contains(cond.getKeyword())
-                                .or(brand.name.contains(cond.getKeyword()))
-                                .or(mainCategory.name.contains(cond.getKeyword()))
-                                .or(subCategory.name.contains(cond.getKeyword()))
-                );
+        String sql = "SELECT p.id, p.title, b.name, f.file_name, po.price, p.discount_rate " +
+                "FROM product p " +
+                "LEFT JOIN product_option po ON p.product_option_id = po.id " +
+                "LEFT JOIN main_category mc ON po.main_category_id = mc.id " +
+                "LEFT JOIN sub_category sc ON po.sub_category_id = sc.id " +
+                "LEFT JOIN brand b ON po.brand_id = b.id " +
+                "LEFT JOIN common_file f ON po.common_file_id = f.id " +
+                "WHERE MATCH(p.title) AGAINST(:keyword IN BOOLEAN MODE) " +
+                "OR MATCH(b.name) AGAINST(:keyword IN BOOLEAN MODE) " +
+                "OR MATCH(mc.name) AGAINST(:keyword IN BOOLEAN MODE) " +
+                "OR MATCH(sc.name) AGAINST(:keyword IN BOOLEAN MODE) " +
+                "LIMIT :offset, :limit";
 
-        return PageableExecutionUtils.getPage(result, pageable, count::fetchOne);
+        Query query = em.createNativeQuery(sql);
+        query.setParameter("keyword", cond.getKeyword());
+        query.setParameter("offset", pageable.getOffset());
+        query.setParameter("limit", pageable.getPageSize());
+        List<Object> objects = query.getResultList();
+        List<ProductListResponse> result = objects.stream()
+                .parallel().map(
+                row -> new ProductListResponse(
+                        (Long) ((Object[]) row)[0],
+                        (String) ((Object[]) row)[1],
+                        (String) ((Object[]) row)[2],
+                        (String) ((Object[]) row)[3],
+                        (Integer) ((Object[]) row)[4],
+                        (Double) ((Object[]) row)[5]
+                )).toList();
+
+        sql = "SELECT COUNT(*) " +
+                "FROM product p " +
+                "LEFT JOIN product_option po ON p.product_option_id = po.id " +
+                "LEFT JOIN main_category mc ON po.main_category_id = mc.id " +
+                "LEFT JOIN sub_category sc ON po.sub_category_id = sc.id " +
+                "LEFT JOIN brand b ON po.brand_id = b.id " +
+                "LEFT JOIN common_file f ON po.common_file_id = f.id " +
+                "WHERE MATCH(p.title) AGAINST(:keyword IN BOOLEAN MODE) " +
+                "OR MATCH(b.name) AGAINST(:keyword IN BOOLEAN MODE) " +
+                "OR MATCH(mc.name) AGAINST(:keyword IN BOOLEAN MODE) " +
+                "OR MATCH(sc.name) AGAINST(:keyword IN BOOLEAN MODE)";
+
+        query = em.createNativeQuery(sql);
+        query.setParameter("keyword", cond.getKeyword());
+        int count = query.getFirstResult();
+
+        return PageableExecutionUtils.getPage(result, pageable, () -> count);
     }
 
     private static BooleanExpression mainCategoryEq(ProductSearchCond cond) {

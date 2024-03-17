@@ -128,7 +128,8 @@ public class ProductService {
     public Page<ProductListResponse> findAllByKeyword(String query, int offset) {
         ProductSearchCond cond = new ProductSearchCond(query);
         PageRequest pageable = PageRequest.of(offset, 18);
-        return productRepository.findAllByKeyword(cond, pageable);
+        Page<ProductListResponse> products = productRepository.findAllByKeyword(cond, pageable);
+        return products;
     }
 
     public List<Product> getRecommendProduct(Member member) {
